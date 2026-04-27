@@ -1,0 +1,37 @@
+:root {
+  /* Brand Colors */
+  --primary: #03A9F4;
+  --primary-light: #4FC3F7;
+  --primary-dark: #0288D1;
+  --accent: #EC407A;
+  --accent-light: #F48FB1;
+  
+  /* Backgrounds */
+  --bg-base: #FFFFFF;
+  --bg-subtle: #F8FAFC;
+  --bg-sidebar: #0D1B2A;
+  
+  /* Text */
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --text-light: #F8FAFC;
+  
+  /* Status Colors */
+  --positive: #10B981;
+  --negative: #EF4444;
+  
+  /* Borders and Shadows */
+  --border: #E2E8F0;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.04);
+  
+  /* Gradients */
+  --gradient-accent: linear-gradient(135deg, var(--primary), var(--accent));
+  
+  /* Border Radius */
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+}

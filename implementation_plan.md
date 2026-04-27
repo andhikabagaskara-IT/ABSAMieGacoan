@@ -188,7 +188,7 @@ Pipeline preprocessing Bahasa Indonesia:
 
 ---
 
-### Tahap 7: Dashboard Interaktif VueJS
+### Tahap 8: Dashboard Interaktif VueJS (Frontend)
 
 #### [NEW] `dashboard/` — Aplikasi VueJS
 
@@ -230,6 +230,41 @@ Fitur-fitur dashboard untuk manajemen restoran:
    - Search functionality
    - Export data
 
+#### Arsitektur Komponen & Data Flow (Mermaid Flowchart)
+
+```mermaid
+graph TD
+    A[dashboard_data.json] -->|fetch on mount| B(useDashboardData.js)
+    
+    subgraph "Vue Application Layout"
+    C[App.vue] --> D[AppLayout.vue]
+    D --> E[AppSidebar.vue]
+    D --> F[AppHeader.vue]
+    D --> G{Vue Router}
+    end
+
+    B -.->|provide/inject| G
+
+    subgraph "Pages / Views"
+    G -->|/| H[OverviewPage]
+    G -->|/sync| I[SyncCenterPage]
+    G -->|/branches| J[BranchesPage]
+    G -->|/aspects| K[AspectDivePage]
+    G -->|/algorithm| L[AlgorithmLabPage]
+    G -->|/explorer| M[ExplorerPage]
+    end
+
+    subgraph "Shared Components"
+    H -.-> N[StatCard]
+    H -.-> O[SentimentBarChart]
+    J -.-> O
+    J -.-> P[BranchCard]
+    K -.-> Q[AspectRadarChart]
+    L -.-> R[PredictionResult]
+    M -.-> S[DataTable]
+    end
+```
+
 ---
 
 ## Open Questions
@@ -260,16 +295,16 @@ Fitur-fitur dashboard untuk manajemen restoran:
 
 ## Urutan Pengerjaan
 
-| No  | Tahap                                    | Status      |
-| --- | ---------------------------------------- | ----------- |
-| 1   | Setup environment + Install dependencies | ✅ Selesai  |
-| 2   | Scraping data 12 cabang                  | ✅ Selesai  |
-| 3   | Pelabelan sentimen                       | ✅ Selesai  |
-| 4   | Preprocessing data                       | ✅ Selesai  |
-| 5   | Klasifikasi SVM & Naive Bayes            | ✅ Selesai  |
-| 6   | Ekstraksi aspek LDA                      | ✅ Selesai  |
-| 7   | Export data untuk dashboard              | ✅ Selesai  |
-| 8   | Dashboard VueJS (Frontend)               | 🔜 Sedang  |
+| No  | Tahap                                    | Status     |
+| --- | ---------------------------------------- | ---------- |
+| 1   | Setup environment + Install dependencies | ✅ Selesai |
+| 2   | Scraping data 12 cabang                  | ✅ Selesai |
+| 3   | Pelabelan sentimen                       | ✅ Selesai |
+| 4   | Preprocessing data                       | ✅ Selesai |
+| 5   | Klasifikasi SVM & Naive Bayes            | ✅ Selesai |
+| 6   | Ekstraksi aspek LDA                      | ✅ Selesai |
+| 7   | Export data untuk dashboard              | ✅ Selesai |
+| 8   | Dashboard VueJS (Frontend)               | 🔄 30% Selesai |
 
 > [!NOTE]
 > **Tahap 1–7 telah selesai.** Data telah diekspor ke `data/export/dashboard_data.json` (51.885 ulasan, 568KB).
