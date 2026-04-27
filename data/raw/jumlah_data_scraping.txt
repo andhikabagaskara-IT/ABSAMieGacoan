@@ -1,0 +1,19 @@
+Data scraping 12 cabang Mie Gacoan Kota Surabaya
+
+- Mie_Gacoan_Manyar_Kertoarjo.csv (5000)
+- Mie_Gacoan_Ir_Soekarno.csv (4827)
+- Mie_Gacoan_Kenjeran.csv (4557)
+- Mie_Gacoan_Margorejo.csv (5000)
+- Mie_Gacoan_Mayjen_Sungkono.csv (5000)
+- Mie_Gacoan_Ngagel.csv (4640)
+- Mie_Gacoan_Merr.csv (5000)
+- Mie_Gacoan_Kenjeran_2.csv (4512)
+- Mie_Gacoan_Manukan.csv (4879)
+- Mie_Gacoan_Ahmad_Yani.csv (4625)
+- Mie_Gacoan_Wiyung.csv (5000)
+- Mie_Gacoan_Ambengan.csv (4614)
+
+#=================
+ TOTAL 57654 data 
+#=================
+

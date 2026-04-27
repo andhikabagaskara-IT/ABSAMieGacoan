@@ -1,0 +1,37 @@
+=== LAPORAN PERBANDINGAN PERFORMA MODEL ===
+
+--- 1. SUPPORT VECTOR MACHINE (SVM) ---
+Waktu Training : 4.73 detik
+Accuracy       : 0.9962
+Precision      : 0.9964
+Recall         : 0.9993
+F1-Score       : 0.9979
+
+Classification Report (SVM):
+              precision    recall  f1-score   support
+
+     negatif       1.00      0.97      0.98      1273
+     positif       1.00      1.00      1.00      9104
+
+    accuracy                           1.00     10377
+   macro avg       1.00      0.99      0.99     10377
+weighted avg       1.00      1.00      1.00     10377
+
+-------------------------------------------------
+
+--- 2. NAIVE BAYES (MULTINOMIAL) ---
+Waktu Training : 0.09 detik
+Accuracy       : 0.9882
+Precision      : 0.9907
+Recall         : 0.9959
+F1-Score       : 0.9933
+
+Classification Report (Naive Bayes):
+              precision    recall  f1-score   support
+
+     negatif       0.97      0.93      0.95      1273
+     positif       0.99      1.00      0.99      9104
+
+    accuracy                           0.99     10377
+   macro avg       0.98      0.96      0.97     10377
+weighted avg       0.99      0.99      0.99     10377
