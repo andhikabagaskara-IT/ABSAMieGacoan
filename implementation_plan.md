@@ -260,16 +260,17 @@ Fitur-fitur dashboard untuk manajemen restoran:
 
 ## Urutan Pengerjaan
 
-| No  | Tahap                                    | Status   |
-| --- | ---------------------------------------- | -------- |
-| 1   | Setup environment + Install dependencies | 🔜 Mulai |
-| 2   | Scraping data 12 cabang                  | 🔜       |
-| 3   | Pelabelan sentimen                       | ⏳       |
-| 4   | Preprocessing data                       | ⏳       |
-| 5   | Klasifikasi SVM & Naive Bayes            | ⏳       |
-| 6   | Ekstraksi aspek LDA                      | ⏳       |
-| 7   | Export data untuk dashboard              | ⏳       |
-| 8   | Dashboard VueJS                          | ⏳       |
+| No  | Tahap                                    | Status      |
+| --- | ---------------------------------------- | ----------- |
+| 1   | Setup environment + Install dependencies | ✅ Selesai  |
+| 2   | Scraping data 12 cabang                  | ✅ Selesai  |
+| 3   | Pelabelan sentimen                       | ✅ Selesai  |
+| 4   | Preprocessing data                       | ✅ Selesai  |
+| 5   | Klasifikasi SVM & Naive Bayes            | ✅ Selesai  |
+| 6   | Ekstraksi aspek LDA                      | ✅ Selesai  |
+| 7   | Export data untuk dashboard              | ✅ Selesai  |
+| 8   | Dashboard VueJS (Frontend)               | 🔜 Sedang  |
 
 > [!NOTE]
-> Saya akan mulai dari **Tahap 1 (Setup + Scraping)** setelah plan ini disetujui. Setiap tahap akan dikerjakan secara berurutan karena ada dependency antar tahap.
+> **Tahap 1–7 telah selesai.** Data telah diekspor ke `data/export/dashboard_data.json` (51.885 ulasan, 568KB).
+> Tahap 8 (Dashboard VueJS) sedang dalam pengerjaan — detail plan frontend tersedia di artifact terpisah.
