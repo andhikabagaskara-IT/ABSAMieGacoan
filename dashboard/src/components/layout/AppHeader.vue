@@ -1,6 +1,9 @@
 <template>
   <header class="app-header">
     <div class="header-title">
+      <button class="mobile-toggle" @click="$emit('toggle-sidebar')">
+        <Menu class="icon" />
+      </button>
       <h1>{{ title }}</h1>
     </div>
     <div class="header-actions">
@@ -15,6 +18,9 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { Menu } from 'lucide-vue-next'
+
+defineEmits(['toggle-sidebar'])
 
 const route = useRoute()
 
@@ -44,6 +50,31 @@ const title = computed(() => {
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  padding: 0.25rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.mobile-toggle:hover {
+  background-color: var(--bg-subtle);
+}
+
+.mobile-toggle .icon {
+  width: 24px;
+  height: 24px;
 }
 
 .header-title h1 {
@@ -93,5 +124,24 @@ const title = computed(() => {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-primary);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .app-header {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .user-name {
+    display: none;
+  }
 }
 </style>

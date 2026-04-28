@@ -1,5 +1,5 @@
 <template>
-  <aside class="sidebar">
+  <aside class="sidebar" :class="{ 'is-open': isOpen }">
     <div class="sidebar-header">
       <div class="logo">
         <span class="logo-icon">🍜</span>
@@ -13,37 +13,37 @@
     <nav class="sidebar-nav">
       <ul>
         <li>
-          <router-link to="/" class="nav-item">
+          <router-link to="/" class="nav-item" @click="$emit('close')">
             <LayoutDashboard class="icon" />
             <span>Overview</span>
           </router-link>
         </li>
         <li>
-          <router-link to="/sync" class="nav-item">
+          <router-link to="/sync" class="nav-item" @click="$emit('close')">
             <RefreshCw class="icon" />
             <span>Sync Center</span>
           </router-link>
         </li>
         <li>
-          <router-link to="/branches" class="nav-item">
+          <router-link to="/branches" class="nav-item" @click="$emit('close')">
             <Store class="icon" />
             <span>Analisis Cabang</span>
           </router-link>
         </li>
         <li>
-          <router-link to="/aspects" class="nav-item">
+          <router-link to="/aspects" class="nav-item" @click="$emit('close')">
             <PieChart class="icon" />
             <span>Aspek Deep Dive</span>
           </router-link>
         </li>
         <li>
-          <router-link to="/algorithm" class="nav-item">
+          <router-link to="/algorithm" class="nav-item" @click="$emit('close')">
             <FlaskConical class="icon" />
             <span>Algorithm Lab</span>
           </router-link>
         </li>
         <li>
-          <router-link to="/explorer" class="nav-item">
+          <router-link to="/explorer" class="nav-item" @click="$emit('close')">
             <Database class="icon" />
             <span>Data Explorer</span>
           </router-link>
@@ -71,10 +71,17 @@ import {
   Store, 
   PieChart, 
   FlaskConical, 
-  Database,
-  TrendingUp,
   Clock
 } from 'lucide-vue-next'
+
+const props = defineProps({
+  isOpen: {
+    type: Boolean,
+    default: false
+  }
+})
+
+defineEmits(['close'])
 </script>
 
 <style scoped>
@@ -89,6 +96,8 @@ import {
   left: 0;
   top: 0;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 50;
+  transition: transform 0.3s ease;
 }
 
 .sidebar-header {
@@ -179,5 +188,16 @@ import {
 .icon-small {
   width: 14px;
   height: 14px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .sidebar.is-open {
+    transform: translateX(0);
+  }
 }
 </style>
