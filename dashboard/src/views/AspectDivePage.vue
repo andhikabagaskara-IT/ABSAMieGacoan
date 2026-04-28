@@ -105,7 +105,7 @@ const filteredBranchAspectData = computed(() => {
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 1.5rem;
-  height: 400px;
+  min-height: 400px;
 }
 
 .bottom-row {

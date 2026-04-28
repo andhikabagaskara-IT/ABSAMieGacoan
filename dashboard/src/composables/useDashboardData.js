@@ -12,8 +12,7 @@ const ASPECT_LABELS = {
   'Topik 1': 'Rasa & Bumbu',
   'Topik 2': 'Tempat & Kebersihan',
   'Topik 3': 'Pelayanan',
-  'Topik 4': 'Harga & Porsi',
-  'Topik 5': 'Kualitas Keseluruhan'
+  'Topik 4': 'Harga & Porsi'
 }
 
 let isFetching = false

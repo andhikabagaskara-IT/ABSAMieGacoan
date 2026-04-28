@@ -49,6 +49,17 @@
           </router-link>
         </li>
       </ul>
+      
+      <div class="nav-divider"></div>
+      
+      <ul>
+        <li>
+          <router-link to="/profile" class="nav-item" @click="$emit('close')">
+            <UserCircle class="icon" />
+            <span>Profil</span>
+          </router-link>
+        </li>
+      </ul>
     </nav>
     
     <div class="sidebar-footer">
@@ -71,6 +82,9 @@ import {
   Store, 
   PieChart, 
   FlaskConical, 
+  Database,
+  UserCircle,
+  TrendingUp,
   Clock
 } from 'lucide-vue-next'
 
@@ -167,6 +181,12 @@ defineEmits(['close'])
 .icon {
   width: 20px;
   height: 20px;
+}
+
+.nav-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0.5rem 1rem;
 }
 
 .sidebar-footer {
