@@ -9,8 +9,8 @@
     <div class="login-card glass-card">
       <div class="login-header">
         <span class="logo-emoji">🍜</span>
-        <h1>GACOAN INSIGHT</h1>
-        <p>Sentiment Analysis Platform</p>
+        <h1>GACOAN ANALYTICS</h1>
+        <p>Sentiment Analysis by Andhika IT</p>
       </div>
 
       <form @submit.prevent="handleLogin" class="login-form">

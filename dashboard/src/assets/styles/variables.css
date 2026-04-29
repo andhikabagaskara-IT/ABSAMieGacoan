@@ -35,3 +35,17 @@
   /* Transitions */
   --transition-fast: 0.2s ease;
 }
+
+[data-theme="dark"] {
+  --bg-base: #1E293B;
+  --bg-subtle: #0F172A;
+  --bg-sidebar: #0B1120;
+  
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-light: #F8FAFC;
+  
+  --border: #334155;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+}

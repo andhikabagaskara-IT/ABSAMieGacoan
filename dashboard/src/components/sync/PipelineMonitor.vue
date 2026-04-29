@@ -1,5 +1,5 @@
 <template>
-  <div class="card monitor-card">
+  <div class="card monitor-card" :class="{ 'is-processing': isActive }">
     <div class="card-header">
       <Activity class="icon text-primary" />
       <h3 class="card-title">Processing Monitor</h3>
@@ -83,6 +83,12 @@ const currentStageIndex = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.monitor-card.is-processing {
+  box-shadow: 0 0 15px rgba(3, 169, 244, 0.2);
+  border-color: var(--primary-light);
 }
 
 .card-header {
@@ -165,10 +171,11 @@ const currentStageIndex = computed(() => {
 }
 
 .spinning {
-  animation: spin 1s linear infinite;
+  animation: spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @keyframes spin {
+  0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
@@ -204,7 +211,16 @@ const currentStageIndex = computed(() => {
 .is-active .stage-icon {
   background-color: var(--accent);
   color: white;
+  box-shadow: 0 0 0 4px rgba(236, 64, 122, 0.2);
+  animation: stagePulse 2s infinite;
 }
+
+@keyframes stagePulse {
+  0% { box-shadow: 0 0 0 0 rgba(236, 64, 122, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(236, 64, 122, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(236, 64, 122, 0); }
+}
+
 .is-active .stage-name {
   color: var(--accent);
   font-weight: 600;
@@ -249,23 +265,55 @@ const currentStageIndex = computed(() => {
   height: 100%;
   background-color: var(--primary);
   border-radius: 4px;
-  transition: width 0.3s ease;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
   background-image: linear-gradient(
     45deg,
-    rgba(255, 255, 255, 0.15) 25%,
+    rgba(255, 255, 255, 0.25) 25%,
     transparent 25%,
     transparent 50%,
-    rgba(255, 255, 255, 0.15) 50%,
-    rgba(255, 255, 255, 0.15) 75%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.25) 75%,
     transparent 75%,
     transparent
   );
-  background-size: 1rem 1rem;
+  background-size: 2rem 2rem;
   animation: progress-stripes 1s linear infinite;
 }
 
+.progress-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 @keyframes progress-stripes {
-  from { background-position: 1rem 0; }
+  from { background-position: 2rem 0; }
   to { background-position: 0 0; }
 }
 

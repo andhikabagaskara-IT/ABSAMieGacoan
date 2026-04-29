@@ -45,6 +45,11 @@
     <div class="leaderboard-wrapper">
       <BranchLeaderboard :branchData="branchSentiment" />
     </div>
+
+    <!-- Row 4: Branch Gallery -->
+    <div class="gallery-wrapper">
+      <BranchGallery />
+    </div>
   </div>
 </template>
 
@@ -55,6 +60,7 @@ import StatCard from '../components/cards/StatCard.vue'
 import SentimentDonut from '../components/charts/SentimentDonut.vue'
 import SentimentBarChart from '../components/charts/SentimentBarChart.vue'
 import BranchLeaderboard from '../components/cards/BranchLeaderboard.vue'
+import BranchGallery from '../components/cards/BranchGallery.vue'
 
 const { 
   totalReviews, 
@@ -95,8 +101,8 @@ const formatNumber = (num) => {
   height: 100%;
 }
 
-/* Leaderboard */
-.leaderboard-wrapper {
+/* Leaderboard & Gallery */
+.leaderboard-wrapper, .gallery-wrapper {
   margin-top: 2rem;
 }
 

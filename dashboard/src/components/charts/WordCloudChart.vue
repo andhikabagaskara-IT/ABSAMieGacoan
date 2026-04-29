@@ -10,14 +10,16 @@
     </div>
     
     <div class="cloud-wrapper">
-      <div 
-        v-for="(word, index) in currentWords" 
-        :key="word" 
-        class="cloud-word"
-        :style="getWordStyle(index, currentWords.length)"
-      >
-        {{ word }}
-      </div>
+      <transition-group name="cloud-anim" tag="div" class="cloud-inner">
+        <div 
+          v-for="(word, index) in currentWords" 
+          :key="word + selectedTopic" 
+          class="cloud-word"
+          :style="getWordStyle(index, currentWords.length)"
+        >
+          {{ word }}
+        </div>
+      </transition-group>
     </div>
   </div>
 </template>
@@ -75,8 +77,10 @@ const getWordStyle = (index, total) => {
     color,
     marginLeft: `${ml}px`,
     marginTop: `${mt}px`,
-    fontWeight: index < 3 ? 700 : (index < 6 ? 600 : 400),
-    opacity: 0.8 + (sizeRatio * 0.2)
+    fontWeight: index < 3 ? 800 : (index < 6 ? 600 : 500),
+    opacity: 0.85 + (sizeRatio * 0.15),
+    animationDelay: `${index * 0.05}s`,
+    animationDuration: `${3 + (index % 3)}s`
   }
 }
 </script>
@@ -110,26 +114,63 @@ const getWordStyle = (index, total) => {
 
 .cloud-wrapper {
   flex: 1;
+  min-height: 250px;
+  background: radial-gradient(circle at center, rgba(3, 169, 244, 0.05) 0%, transparent 70%);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--border);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cloud-inner {
   display: flex;
   flex-wrap: wrap;
   align-content: center;
   justify-content: center;
-  gap: 1rem;
-  padding: 1rem;
-  min-height: 250px;
-  background-color: var(--bg-subtle);
-  border-radius: var(--radius-md);
-  border: 1px dashed var(--border);
+  gap: 1.25rem;
+  padding: 2rem;
+  width: 100%;
+  height: 100%;
 }
 
 .cloud-word {
   line-height: 1;
-  transition: transform 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: default;
+  display: inline-block;
+  animation: float linear infinite alternate;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .cloud-word:hover {
-  transform: scale(1.1);
+  transform: scale(1.15) translateY(-5px) !important;
   z-index: 10;
+  text-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  opacity: 1 !important;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(1deg); }
+  100% { transform: translateY(3px) rotate(-1deg); }
+}
+
+/* Transition Group Animations */
+.cloud-anim-enter-active,
+.cloud-anim-leave-active {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cloud-anim-enter-from {
+  opacity: 0;
+  transform: scale(0.5) translateY(20px);
+}
+
+.cloud-anim-leave-to {
+  opacity: 0;
+  transform: scale(0.5) translateY(-20px);
 }
 </style>

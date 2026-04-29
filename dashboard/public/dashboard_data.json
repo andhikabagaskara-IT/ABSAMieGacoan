@@ -1,8 +1,8 @@
 {
     "total_reviews": 51885,
     "sentiment_distribution": {
-        "positif": 45518,
-        "negatif": 6367
+        "positif": 45145,
+        "negatif": 6740
     },
     "aspect_distribution": {
         "Topik 2": 11726,
@@ -13,20 +13,20 @@
     },
     "branch_sentiment": {
         "Mie Gacoan - Ahmad Yani": {
-            "negatif": 186,
-            "positif": 4098
+            "negatif": 274,
+            "positif": 4010
         },
         "Mie Gacoan - Ambengan": {
-            "negatif": 261,
-            "positif": 4047
+            "negatif": 345,
+            "positif": 3963
         },
         "Mie Gacoan - Ir Soekarno": {
-            "negatif": 140,
-            "positif": 4365
+            "negatif": 231,
+            "positif": 4274
         },
         "Mie Gacoan - Kenjeran": {
-            "negatif": 168,
-            "positif": 4062
+            "negatif": 222,
+            "positif": 4008
         },
         "Mie Gacoan - Manukan": {
             "negatif": 731,
@@ -53,8 +53,8 @@
             "positif": 3747
         },
         "Mie Gacoan Kenjeran 2": {
-            "negatif": 136,
-            "positif": 4043
+            "negatif": 192,
+            "positif": 3987
         },
         "Mie Gacoan Mayjen Sungkono": {
             "negatif": 749,
@@ -172,7 +172,7 @@
             "tanggal_ulasan": "5 hari lalu",
             "rating": 5,
             "teks_komentar": "Pelayanannya memuaskan",
-            "sentimen": "positif",
+            "sentimen": "negatif",
             "aspek_lda": "Topik 3"
         },
         {
@@ -946,7 +946,7 @@
             "tanggal_ulasan": "3 minggu lalu",
             "rating": 5,
             "teks_komentar": "sering kesini pulang kuliah",
-            "sentimen": "positif",
+            "sentimen": "negatif",
             "aspek_lda": "Topik 3"
         },
         {
@@ -1233,7 +1233,7 @@
             "nama_pelanggan": "Dicky Cahyo",
             "tanggal_ulasan": "4 hari lalu",
             "rating": 5,
-            "teks_komentar": "Mie Gacoan Merr selalu bikin nagih.\nPedasnya mantap, udang kejunya lumer, dan ada juga udang rambutan serta lumpia udang yang enak banget. Tempatnya luas, self-service, dan cocok buat makan rame-rame.",
+            "teks_komentar": "Mie Gacoan Merr selalu bikin nagih.\r\nPedasnya mantap, udang kejunya lumer, dan ada juga udang rambutan serta lumpia udang yang enak banget. Tempatnya luas, self-service, dan cocok buat makan rame-rame.",
             "sentimen": "positif",
             "aspek_lda": "Topik 2"
         },
@@ -1585,7 +1585,7 @@
             "tanggal_ulasan": "10 jam lalu",
             "rating": 5,
             "teks_komentar": "Pelayanannya memuaskan",
-            "sentimen": "positif",
+            "sentimen": "negatif",
             "aspek_lda": "Topik 3"
         },
         {
@@ -1630,7 +1630,7 @@
             "tanggal_ulasan": "2 bulan lalu",
             "rating": 5,
             "teks_komentar": "Pelayanannya memuaskan",
-            "sentimen": "positif",
+            "sentimen": "negatif",
             "aspek_lda": "Topik 3"
         },
         {
@@ -1944,7 +1944,7 @@
             "nama_pelanggan": "Salsabila Azzahra",
             "tanggal_ulasan": "5 bulan lalu",
             "rating": 5,
-            "teks_komentar": "Makanannya enak fresh semua 🩷\nBeda sama yang ada di kotaku sumpah real 😇",
+            "teks_komentar": "Makanannya enak fresh semua 🩷\r\nBeda sama yang ada di kotaku sumpah real 😇",
             "sentimen": "positif",
             "aspek_lda": "Topik 5"
         },
@@ -2935,7 +2935,7 @@
             "tanggal_ulasan": "sebulan lalu",
             "rating": 5,
             "teks_komentar": "pelayanannya baik dan ramah👍 …",
-            "sentimen": "positif",
+            "sentimen": "negatif",
             "aspek_lda": "Topik 3"
         },
         {
@@ -5274,7 +5274,7 @@
             "nama_pelanggan": "amirul hadi",
             "tanggal_ulasan": "7 bulan lalu",
             "rating": 5,
-            "teks_komentar": "Layanan bagus, makanan enak\nWaktu tunggu pesanan juga cepat",
+            "teks_komentar": "Layanan bagus, makanan enak\r\nWaktu tunggu pesanan juga cepat",
             "sentimen": "positif",
             "aspek_lda": "Topik 5"
         },
@@ -8353,7 +8353,7 @@
             "tanggal_ulasan": "Diedit 5 bulan lalu",
             "rating": 5,
             "teks_komentar": "ramah",
-            "sentimen": "positif",
+            "sentimen": "negatif",
             "aspek_lda": "Topik 3"
         },
         {
@@ -10333,7 +10333,7 @@
             "tanggal_ulasan": "1 hari lalu",
             "rating": 5,
             "teks_komentar": "Pelayanannya memuaskan",
-            "sentimen": "positif",
+            "sentimen": "negatif",
             "aspek_lda": "Topik 3"
         },
         {
@@ -10423,7 +10423,7 @@
             "tanggal_ulasan": "6 bulan lalu",
             "rating": 5,
             "teks_komentar": "Pelayanan baik",
-            "sentimen": "positif",
+            "sentimen": "negatif",
             "aspek_lda": "Topik 3"
         },
         {
@@ -13528,7 +13528,7 @@
             "tanggal_ulasan": "8 bulan lalu",
             "rating": 5,
             "teks_komentar": "Sangat memuaskan",
-            "sentimen": "positif",
+            "sentimen": "negatif",
             "aspek_lda": "Topik 3"
         },
         {

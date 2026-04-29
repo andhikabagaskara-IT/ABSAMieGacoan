@@ -2,7 +2,8 @@
   <aside class="sidebar" :class="{ 'is-open': isOpen }">
     <div class="sidebar-header">
       <div class="logo">
-        <span class="logo-icon">🍜</span>
+        <img v-if="companyLogo" :src="companyLogo" alt="Logo" class="custom-logo" />
+        <span v-else class="logo-icon">🍜</span>
         <div class="logo-text">
           <h2>GACOAN INSIGHT</h2>
           <p>Sentiment Platform</p>
@@ -88,6 +89,8 @@ import {
   Clock
 } from 'lucide-vue-next'
 
+import { ref, onMounted } from 'vue'
+
 const props = defineProps({
   isOpen: {
     type: Boolean,
@@ -96,6 +99,16 @@ const props = defineProps({
 })
 
 defineEmits(['close'])
+
+const companyLogo = ref('')
+
+onMounted(() => {
+  companyLogo.value = localStorage.getItem('companyLogo') || ''
+  
+  window.addEventListener('profile-updated', () => {
+    companyLogo.value = localStorage.getItem('companyLogo') || ''
+  })
+})
 </script>
 
 <style scoped>
@@ -110,8 +123,11 @@ defineEmits(['close'])
   left: 0;
   top: 0;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-top-right-radius: 24px;
+  border-bottom-right-radius: 24px;
   z-index: 50;
   transition: transform 0.3s ease;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
 }
 
 .sidebar-header {
@@ -127,6 +143,13 @@ defineEmits(['close'])
 
 .logo-icon {
   font-size: 1.5rem;
+}
+
+.custom-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 4px;
 }
 
 .logo-text h2 {
@@ -148,6 +171,21 @@ defineEmits(['close'])
   flex: 1;
   padding: 1.5rem 0;
   overflow-y: auto;
+}
+
+/* Custom Scrollbar for Sidebar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.4);
 }
 
 .sidebar-nav ul {
