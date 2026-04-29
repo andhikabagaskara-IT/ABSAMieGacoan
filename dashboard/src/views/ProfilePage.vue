@@ -2,7 +2,7 @@
   <div class="profile-page">
     <div class="section-title">
       <h2>Pengaturan Profil</h2>
-      <p>Kelola informasi akun dan preferensi tampilan Anda.</p>
+      <p>Kelola informasi akun, preferensi tampilan, dan info sistem.</p>
     </div>
     
     <div class="profile-grid">
@@ -19,7 +19,7 @@
             <button class="btn btn-primary" @click="$refs.profileInput.click()">Ubah Foto</button>
             <button class="btn btn-outline text-negative border-negative" @click="removeImage('profile')" v-if="profileImage">Hapus</button>
           </div>
-          <p class="help-text">Rekomendasi ukuran: 256x256px. Format: JPG, PNG, GIF.</p>
+          <p class="help-text">Rekomendasi ukuran: 256x256px. Format: JPG, PNG.</p>
         </div>
       </div>
 
@@ -36,7 +36,74 @@
             <button class="btn btn-primary" @click="$refs.logoInput.click()">Ubah Logo</button>
             <button class="btn btn-outline text-negative border-negative" @click="removeImage('logo')" v-if="companyLogo">Hapus</button>
           </div>
-          <p class="help-text">Rekomendasi ukuran: 128x128px rasio 1:1. Format: PNG transparan disarankan.</p>
+          <p class="help-text">Rekomendasi rasio 1:1. Format: PNG transparan disarankan.</p>
+        </div>
+      </div>
+
+      <!-- Setting Data Diri -->
+      <div class="card form-card">
+        <h3 class="card-title">Data Diri</h3>
+        <form @submit.prevent="saveProfile" class="form-body">
+          <div class="form-group">
+            <label>Nama Lengkap</label>
+            <input type="text" class="input-field" v-model="profileForm.name" placeholder="Nama Admin" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="input-field" v-model="profileForm.email" placeholder="admin@gacoan.com" />
+          </div>
+          <div class="form-group">
+            <label>Role</label>
+            <input type="text" class="input-field" v-model="profileForm.role" disabled />
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">Simpan Perubahan</button>
+        </form>
+      </div>
+
+      <!-- Setting Password -->
+      <div class="card form-card">
+        <h3 class="card-title">Ubah Password</h3>
+        <form @submit.prevent="changePassword" class="form-body">
+          <div class="form-group">
+            <label>Password Saat Ini</label>
+            <input type="password" class="input-field" v-model="passwordForm.current" placeholder="••••••••" required />
+          </div>
+          <div class="form-group">
+            <label>Password Baru</label>
+            <input type="password" class="input-field" v-model="passwordForm.new" placeholder="••••••••" required />
+          </div>
+          <div class="form-group">
+            <label>Konfirmasi Password Baru</label>
+            <input type="password" class="input-field" v-model="passwordForm.confirm" placeholder="••••••••" required />
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">Perbarui Password</button>
+        </form>
+      </div>
+
+      <!-- Info/About Sistem -->
+      <div class="card info-card" style="grid-column: 1 / -1;">
+        <h3 class="card-title">Tentang Sistem</h3>
+        <div class="system-info">
+          <div class="info-row">
+            <span class="info-label">Nama Sistem</span>
+            <span class="info-value">Gacoan Insight - Sentiment Management Platform</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Versi</span>
+            <span class="info-value">v1.2.0</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Metode ML</span>
+            <span class="info-value">Support Vector Machine (SVM), Naive Bayes, SMOTE, Stratified K-Fold</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Ekstraksi Aspek</span>
+            <span class="info-value">Latent Dirichlet Allocation (LDA)</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Pengembang</span>
+            <span class="info-value">Maulana Andhika | Informatics Engineering UNAIR</span>
+          </div>
         </div>
       </div>
     </div>
@@ -44,7 +111,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 
 const profileInput = ref(null)
 const logoInput = ref(null)
@@ -52,9 +119,28 @@ const logoInput = ref(null)
 const profileImage = ref('')
 const companyLogo = ref('')
 
+const profileForm = reactive({
+  name: 'Admin',
+  email: 'admin@gacoan.com',
+  role: 'Administrator'
+})
+
+const passwordForm = reactive({
+  current: '',
+  new: '',
+  confirm: ''
+})
+
 onMounted(() => {
   profileImage.value = localStorage.getItem('profileImage') || ''
   companyLogo.value = localStorage.getItem('companyLogo') || ''
+  
+  const savedProfile = localStorage.getItem('userProfile')
+  if (savedProfile) {
+    const parsed = JSON.parse(savedProfile)
+    profileForm.name = parsed.name || 'Admin'
+    profileForm.email = parsed.email || 'admin@gacoan.com'
+  }
 })
 
 const handleFileChange = (e, type) => {
@@ -72,7 +158,6 @@ const handleFileChange = (e, type) => {
       localStorage.setItem('companyLogo', base64String)
     }
     
-    // Trigger event so other components update instantly
     window.dispatchEvent(new Event('profile-updated'))
   }
   reader.readAsDataURL(file)
@@ -87,6 +172,23 @@ const removeImage = (type) => {
     localStorage.removeItem('companyLogo')
   }
   window.dispatchEvent(new Event('profile-updated'))
+}
+
+const saveProfile = () => {
+  localStorage.setItem('userProfile', JSON.stringify(profileForm))
+  alert('Data diri berhasil disimpan!')
+}
+
+const changePassword = () => {
+  if (passwordForm.new !== passwordForm.confirm) {
+    alert('Konfirmasi password tidak cocok!')
+    return
+  }
+  // Simplified logic for demo
+  alert('Password berhasil diperbarui!')
+  passwordForm.current = ''
+  passwordForm.new = ''
+  passwordForm.confirm = ''
 }
 </script>
 
@@ -115,11 +217,6 @@ const removeImage = (type) => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
-}
-
-.profile-card {
-  display: flex;
-  flex-direction: column;
 }
 
 .card-title {
@@ -204,9 +301,71 @@ const removeImage = (type) => {
   background-color: rgba(239, 68, 68, 0.1);
 }
 
+/* Forms */
+.form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.mt-3 {
+  margin-top: 0.75rem;
+}
+
+/* Info System */
+.system-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.info-row {
+  display: flex;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  width: 150px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.info-value {
+  flex: 1;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
 @media (max-width: 768px) {
   .profile-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .info-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .info-label {
+    width: 100%;
   }
 }
 </style>

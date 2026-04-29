@@ -4,7 +4,7 @@
 
 Project ini bertujuan untuk melakukan **Aspect-Based Sentiment Analysis (ABSA)** terhadap ulasan pelanggan restoran Mie Gacoan di seluruh kota Surabaya (12 cabang). Hasil analisis akan divisualisasikan dalam **dashboard interaktif VueJS** yang dapat digunakan oleh pihak manajemen sebagai tool analisa sentimen pelanggan.
 
-**Sentimen**: Positif & Negatif  
+**Sentimen**: Positif, Negatif, & Netral  
 **Algoritma Klasifikasi**: SVM & Naive Bayes (sebagai pembanding)  
 **Algoritma Aspek**: LDA (Latent Dirichlet Allocation)  
 **Evaluasi**: Accuracy, Precision, Recall, F1-Score (klasifikasi) + DBI (aspek)  
@@ -43,10 +43,10 @@ graph TD
 > Dengan target 60.000 ulasan, pelabelan manual tidak realistis. Saya mengusulkan **pelabelan otomatis berbasis rating**:
 >
 > - ⭐ Rating 1-2 → **Negatif**
+> - ⭐ Rating 3 → **Netral**
 > - ⭐ Rating 4-5 → **Positif**
-> - ⭐ Rating 3 → **Dibuang** (ambigu/netral)
 >
-> Apakah pendekatan ini sesuai, atau Anda ingin menyertakan rating 3 ke salah satu kategori?
+> Sistem sekarang dikonfigurasi untuk menggunakan 3 kelas tersebut.
 
 > [!IMPORTANT]
 > **Target 5.000 ulasan per cabang**  
@@ -157,8 +157,8 @@ Script scraping yang diperbaiki dan ditingkatkan:
 - Membaca data dari `data/combined/all_reviews.csv`
 - Labeling otomatis berdasarkan rating:
   - Rating 1-2 → `negatif`
+  - Rating 3 → `netral`
   - Rating 4-5 → `positif`
-  - Rating 3 → dibuang (ambigu)
 - Output: `data/labeled/labeled_reviews.csv`
 - Statistik distribusi label
 
@@ -324,13 +324,12 @@ Fitur-fitur dashboard untuk manajemen restoran:
 | 3   | Quality Check & Combining                     | `02_quality_check.py`     | ✅ Selesai       |
 | 4   | Pelabelan sentimen                            | `03_labeling.py`          | ✅ Selesai       |
 | 5   | Preprocessing data NLP                        | `04_preprocessing.py`     | ✅ Selesai       |
-| 6   | Klasifikasi: Stratified K-Fold CV + SMOTE     | `05_classification.py`    | 🔄 Perlu Re-run |
-| 7   | Ekstraksi aspek LDA                           | `06_lda_aspect.py`        | 🔄 Perlu Re-run |
-| 8   | Export data untuk dashboard                   | `07_export_dashboard.py`  | 🔄 Perlu Re-run |
-| 9   | Dashboard VueJS (Frontend)                    | `dashboard/`              | 🔄 30% Selesai  |
+| 6   | Klasifikasi: Stratified K-Fold CV + SMOTE     | `05_classification.py`    | 🔄 Berjalan     |
+| 7   | Ekstraksi aspek LDA                           | `06_lda_aspect.py`        | 🔄 Berjalan     |
+| 8   | Export data untuk dashboard                   | `07_export_dashboard.py`  | 🔄 Berjalan     |
+| 9   | Dashboard VueJS (Frontend)                    | `dashboard/`              | ✅ Selesai      |
 
-> **Tahap 1-5 telah selesai.** Tahap 6-8 memerlukan re-run karena `05_classification.py` telah di-update total untuk mengimplementasi Stratified K-Fold Cross-Validation + SMOTE.
-> Tahap 9 (Dashboard VueJS) sedang dalam pengerjaan.
+> **Tahap 1-5 dan Frontend telah diselesaikan.** Tahap klasifikasi hingga export JSON saat ini berjalan dengan penerapan 3 kelas (Positif, Negatif, Netral).
 
 > **Cara menjalankan ulang pipeline (dari quality check sampai export):**
 > ```bash

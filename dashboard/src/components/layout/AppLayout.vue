@@ -6,18 +6,34 @@ import { useDashboardData } from '../../composables/useDashboardData'
 
 const { fetchData, state } = useDashboardData()
 
-const isSidebarOpen = ref(false)
+const isSidebarOpen = ref(window.innerWidth > 1024)
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value
 }
 
 const closeSidebar = () => {
-  isSidebarOpen.value = false
+  if (window.innerWidth <= 1024) {
+    isSidebarOpen.value = false
+  }
 }
+
+const closeMobileSidebar = () => {
+  if (window.innerWidth <= 1024) {
+    isSidebarOpen.value = false
+  }
+}
+
+const isMobile = ref(window.innerWidth <= 1024)
 
 onMounted(() => {
   fetchData()
+  window.addEventListener('resize', () => {
+    isMobile.value = window.innerWidth <= 1024
+    if (window.innerWidth > 1024 && !isSidebarOpen.value) {
+      // Let user keep it closed if they want, but default to open on desktop
+    }
+  })
 })
 </script>
 
@@ -31,14 +47,13 @@ onMounted(() => {
     </div>
 
     <!-- Mobile overlay -->
-    <div 
-      class="sidebar-overlay" 
-      :class="{ 'is-active': isSidebarOpen }"
+    <div class="sidebar-overlay" 
+      :class="{ 'is-active': isSidebarOpen && isMobile }"
       @click="closeSidebar"
     ></div>
 
-    <AppSidebar :isOpen="isSidebarOpen" @close="closeSidebar" />
-    <div class="main-content">
+    <AppSidebar :isOpen="isSidebarOpen" @close="closeMobileSidebar" />
+    <div class="main-content" :class="{ 'sidebar-closed': !isSidebarOpen }">
       <AppHeader @toggle-sidebar="toggleSidebar" />
       <main class="page-content">
         <div v-if="state.loading" class="loading-state">
@@ -147,10 +162,14 @@ onMounted(() => {
   margin-left: 260px; /* Same as sidebar width */
   display: flex;
   flex-direction: column;
-  transition: margin-left 0.3s ease;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
   z-index: 10;
   position: relative;
+}
+
+.main-content.sidebar-closed {
+  margin-left: 0;
 }
 
 .page-content {

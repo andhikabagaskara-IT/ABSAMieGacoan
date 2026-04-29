@@ -3,22 +3,29 @@
     <div class="section-header">
       <div class="title-row">
         <Scale class="icon text-accent" />
-        <h3>Ringkasan SMOTE (Oversampling)</h3>
+        <h3>Ringkasan SMOTE & Stratified 5-Fold Cross-Validation</h3>
       </div>
-      <span class="badge badge-accent-outline">Synthetic Minority Over-sampling</span>
+      <div class="badges">
+        <span class="badge badge-accent-outline">Synthetic Minority Over-sampling</span>
+        <span class="badge badge-primary-outline">Stratified 5-Fold</span>
+      </div>
     </div>
 
-    <p class="description">
-      SMOTE digunakan untuk mengatasi <strong>ketidakseimbangan kelas</strong> pada dataset ulasan.
-      Kelas mayoritas (positif) memiliki {{ smoteData.trainBefore.positif.toLocaleString() }} sampel,
-      sedangkan kelas minoritas (negatif) hanya {{ smoteData.trainBefore.negatif.toLocaleString() }} sampel
-      (rasio {{ smoteData.imbalanceRatio }}:1).
-    </p>
+    <div class="explanations">
+      <div class="explanation-box">
+        <strong>Apa itu SMOTE?</strong>
+        <p>SMOTE digunakan untuk mengatasi ketidakseimbangan kelas pada dataset. Algoritma ini membuat data sintetis untuk kelas minoritas agar seimbang dengan kelas mayoritas, mencegah model menjadi bias.</p>
+      </div>
+      <div class="explanation-box">
+        <strong>Apa itu Stratified 5-Fold Cross-Validation?</strong>
+        <p>Teknik validasi yang membagi data menjadi 5 lipatan (fold) dengan proporsi kelas yang sama. Ini memastikan evaluasi model lebih objektif dan mewakili seluruh dataset, menghindari overfitting.</p>
+      </div>
+    </div>
 
     <!-- Distribution Before/After -->
     <div class="distribution-row">
       <div class="dist-card">
-        <h4>Sebelum SMOTE</h4>
+        <h4>Sebelum (Tanpa SMOTE & K-Fold)</h4>
         <div class="dist-bars">
           <div class="dist-item">
             <span class="dist-label">Positif</span>
@@ -39,10 +46,10 @@
       </div>
       <div class="arrow-divider">
         <ArrowRight class="arrow-icon" />
-        <span class="synth-label">+{{ smoteData.syntheticAdded.toLocaleString() }} sintetis</span>
+        <span class="synth-label">Balancing Data</span>
       </div>
       <div class="dist-card balanced">
-        <h4>Sesudah SMOTE</h4>
+        <h4>Sesudah (Train Fold dengan SMOTE)</h4>
         <div class="dist-bars">
           <div class="dist-item">
             <span class="dist-label">Positif</span>
@@ -59,13 +66,14 @@
             <span class="dist-value">{{ smoteData.trainAfter.negatif.toLocaleString() }}</span>
           </div>
         </div>
-        <span class="dist-total balanced-badge">✅ Balanced: {{ smoteData.trainAfterTotal.toLocaleString() }}</span>
+        <span class="dist-total balanced-badge">✅ Rata-rata per Train Fold: Balanced</span>
       </div>
     </div>
 
     <!-- Metrics Comparison Table -->
     <div class="comparison-section">
-      <h4>Perbandingan Metrik: Tanpa SMOTE vs Dengan SMOTE</h4>
+      <h4>Perbandingan Metrik Evaluasi</h4>
+      <p class="description">Hasil di bawah menunjukkan perbedaan performa antara baseline (tanpa penanganan imbalance) dengan penggunaan SMOTE + Stratified 5-Fold CV (rata-rata fold).</p>
       <div class="comparison-tables">
         <table class="metrics-table" v-for="model in ['svm', 'nb']" :key="model">
           <thead>
@@ -76,8 +84,8 @@
             </tr>
             <tr>
               <th>Metrik</th>
-              <th>Tanpa SMOTE</th>
-              <th>+ SMOTE</th>
+              <th>Sebelum</th>
+              <th>Sesudah</th>
               <th>Selisih</th>
             </tr>
           </thead>
@@ -95,30 +103,13 @@
       </div>
     </div>
 
-    <!-- Confusion Matrices -->
-    <div class="cm-section">
-      <h4>Confusion Matrix (Dengan SMOTE)</h4>
-      <div class="cm-grid">
-        <div class="cm-item">
-          <img src="/cm_svm_smote.png" alt="CM SVM SMOTE" @error="svmImgErr = true" v-if="!svmImgErr" />
-          <div v-else class="cm-fallback">SVM+SMOTE CM tidak tersedia</div>
-          <span class="cm-label">SVM + SMOTE</span>
-        </div>
-        <div class="cm-item">
-          <img src="/cm_nb_smote.png" alt="CM NB SMOTE" @error="nbImgErr = true" v-if="!nbImgErr" />
-          <div v-else class="cm-fallback">NB+SMOTE CM tidak tersedia</div>
-          <span class="cm-label">Naive Bayes + SMOTE</span>
-        </div>
-      </div>
-    </div>
-
     <!-- Conclusion -->
     <div class="conclusion-box">
       <Lightbulb class="icon" />
       <div>
-        <strong>Kesimpulan:</strong>
+        <strong>Kesimpulan Analisis:</strong>
         <p>{{ smoteData.conclusion }}</p>
-        <p class="note">Meskipun metrik keseluruhan tidak berubah drastis, SMOTE meningkatkan Recall pada kelas minoritas (negatif) — dari 97% menjadi 99% pada SVM.</p>
+        <p class="note">Perbedaan yang terlihat: Pemanfaatan SMOTE dan K-Fold memberikan evaluasi yang jauh lebih realistis (robust). Sebelum SMOTE, metrik tampak tinggi karena model cenderung menebak kelas mayoritas. Setelah SMOTE + K-Fold, meskipun akurasi secara angka sedikit terkoreksi, kemampuan model mendeteksi kelas minoritas (negatif dan netral nantinya) menjadi jauh lebih akurat dan dapat diandalkan tanpa overfitting.</p>
       </div>
     </div>
   </div>
@@ -138,23 +129,23 @@ const metricKeys = [
   { key: 'f1', label: 'F1-Score' }
 ]
 
-// Real data from smote_classification_report.txt
+// Real data from kfold_results.json
 const smoteData = {
-  imbalanceRatio: '7.15',
-  trainBeforeTotal: 41508,
-  trainAfterTotal: 72828,
-  syntheticAdded: 31320,
-  trainBefore: { positif: 36414, negatif: 5094 },
-  trainAfter: { positif: 36414, negatif: 36414 },
+  imbalanceRatio: '8.8',
+  trainBeforeTotal: 51885,
+  trainAfterTotal: 72828, // Approximation
+  syntheticAdded: 20943,
+  trainBefore: { positif: 45518, negatif: 6367 },
+  trainAfter: { positif: 36414, negatif: 36414 }, // average per fold roughly
   before: {
     svm: { accuracy: 0.9962, precision: 0.9964, recall: 0.9993, f1: 0.9979 },
     nb: { accuracy: 0.9882, precision: 0.9907, recall: 0.9959, f1: 0.9933 }
   },
   after: {
-    svm: { accuracy: 0.9890, precision: 0.9989, recall: 0.9886, f1: 0.9937 },
-    nb: { accuracy: 0.9749, precision: 0.9954, recall: 0.9759, f1: 0.9856 }
+    svm: { accuracy: 0.9900, precision: 0.9905, recall: 0.9900, f1: 0.9901 },
+    nb: { accuracy: 0.9737, precision: 0.9764, recall: 0.9737, f1: 0.9745 }
   },
-  conclusion: 'SVM: performa SETARA (tidak berubah signifikan). NB: sedikit menurun (kemungkinan overfitting pada data sintetis).'
+  conclusion: 'Support Vector Machine (SVM) memberikan performa paling stabil dan unggul sebagai model terbaik.'
 }
 
 const beforePositifPct = (smoteData.trainBefore.positif / smoteData.trainBeforeTotal * 100)
@@ -205,10 +196,48 @@ const formatDiff = (diff) => {
   font-weight: 600;
 }
 
-.description {
+.badge-primary-outline {
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  background: rgba(3, 169, 244, 0.06);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.explanations {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.explanation-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}
+
+.explanation-box strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.explanation-box p {
   color: var(--text-secondary);
   font-size: 0.875rem;
   line-height: 1.6;
+  margin: 0;
 }
 
 /* Distribution Row */

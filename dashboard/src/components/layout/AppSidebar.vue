@@ -6,7 +6,7 @@
         <span v-else class="logo-icon">🍜</span>
         <div class="logo-text">
           <h2>GACOAN INSIGHT</h2>
-          <p>Sentiment Platform</p>
+          <p>Analysis Platform <span>by DhikaIT</span></p>
         </div>
       </div>
     </div>
@@ -126,8 +126,13 @@ onMounted(() => {
   border-top-right-radius: 24px;
   border-bottom-right-radius: 24px;
   z-index: 50;
-  transition: transform 0.3s ease;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar.is-open {
+  transform: translateX(0);
 }
 
 .sidebar-header {
@@ -250,12 +255,6 @@ onMounted(() => {
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .sidebar {
-    transform: translateX(-100%);
-  }
-  
-  .sidebar.is-open {
-    transform: translateX(0);
-  }
+  /* Sidebar styles handled globally now for collapsing */
 }
 </style>

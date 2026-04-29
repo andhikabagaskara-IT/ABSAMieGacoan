@@ -10,16 +10,19 @@
     </div>
     
     <div class="cloud-wrapper">
-      <transition-group name="cloud-anim" tag="div" class="cloud-inner">
-        <div 
-          v-for="(word, index) in currentWords" 
-          :key="word + selectedTopic" 
-          class="cloud-word"
-          :style="getWordStyle(index, currentWords.length)"
-        >
-          {{ word }}
+      <img 
+        :src="`/wordcloud_${selectedTopic.toLowerCase().replace(' ', '_')}.png`" 
+        :alt="`Word Cloud ${selectedTopic}`"
+        class="wordcloud-image"
+        @error="handleImageError"
+        v-if="!imageErrorMap[selectedTopic]"
+      />
+      <div v-else class="cloud-fallback">
+        <p>Silakan letakkan gambar <strong>wordcloud_{{ selectedTopic.toLowerCase().replace(' ', '_') }}.png</strong> di folder public.</p>
+        <div class="fallback-keywords">
+          <span v-for="word in currentWords" :key="word" class="fallback-word">{{ word }}</span>
         </div>
-      </transition-group>
+      </div>
     </div>
   </div>
 </template>
@@ -35,8 +38,9 @@ const props = defineProps({
 })
 
 const selectedTopic = ref('Topik 1')
+const imageErrorMap = ref({})
 
-// Hardcoded from LDA topics report
+// Hardcoded dari LDA topics report
 const keywordData = {
   'Topik 1': ['enak', 'pedas', 'bumbu', 'mienya', 'nyaman', 'level', 'meresap', 'khas', 'gurih', 'mantap'],
   'Topik 2': ['tempat', 'bersih', 'nyaman', 'makan', 'luas', 'nagih', 'parkir', 'cozy', 'keluarga', 'suasana'],
@@ -49,39 +53,8 @@ const currentWords = computed(() => {
   return keywordData[selectedTopic.value] || []
 })
 
-// Generate random but deterministic style based on index
-const getWordStyle = (index, total) => {
-  // Largest font for index 0, smallest for last
-  const sizeRatio = 1 - (index / total)
-  const minSize = 14
-  const maxSize = 36
-  const fontSize = minSize + (sizeRatio * (maxSize - minSize))
-  
-  // Mix colors
-  const colors = [
-    'var(--primary)', 
-    'var(--accent)', 
-    'var(--primary-dark)', 
-    '#64748B', 
-    '#10B981', 
-    '#8B5CF6'
-  ]
-  const color = colors[index % colors.length]
-  
-  // Random margin to make it look scattered
-  const ml = Math.random() * 20
-  const mt = Math.random() * 10
-  
-  return {
-    fontSize: `${fontSize}px`,
-    color,
-    marginLeft: `${ml}px`,
-    marginTop: `${mt}px`,
-    fontWeight: index < 3 ? 800 : (index < 6 ? 600 : 500),
-    opacity: 0.85 + (sizeRatio * 0.15),
-    animationDelay: `${index * 0.05}s`,
-    animationDuration: `${3 + (index % 3)}s`
-  }
+const handleImageError = () => {
+  imageErrorMap.value[selectedTopic.value] = true
 }
 </script>
 
@@ -115,7 +88,7 @@ const getWordStyle = (index, total) => {
 .cloud-wrapper {
   flex: 1;
   min-height: 250px;
-  background: radial-gradient(circle at center, rgba(3, 169, 244, 0.05) 0%, transparent 70%);
+  background: var(--bg-subtle);
   border-radius: var(--radius-lg);
   border: 1px dashed var(--border);
   position: relative;
@@ -123,54 +96,38 @@ const getWordStyle = (index, total) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 1rem;
 }
 
-.cloud-inner {
+.wordcloud-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.cloud-fallback {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.cloud-fallback p {
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.fallback-keywords {
   display: flex;
   flex-wrap: wrap;
-  align-content: center;
+  gap: 0.5rem;
   justify-content: center;
-  gap: 1.25rem;
-  padding: 2rem;
-  width: 100%;
-  height: 100%;
 }
 
-.cloud-word {
-  line-height: 1;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  cursor: default;
-  display: inline-block;
-  animation: float linear infinite alternate;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.cloud-word:hover {
-  transform: scale(1.15) translateY(-5px) !important;
-  z-index: 10;
-  text-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  opacity: 1 !important;
-}
-
-@keyframes float {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-5px) rotate(1deg); }
-  100% { transform: translateY(3px) rotate(-1deg); }
-}
-
-/* Transition Group Animations */
-.cloud-anim-enter-active,
-.cloud-anim-leave-active {
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.cloud-anim-enter-from {
-  opacity: 0;
-  transform: scale(0.5) translateY(20px);
-}
-
-.cloud-anim-leave-to {
-  opacity: 0;
-  transform: scale(0.5) translateY(-20px);
+.fallback-word {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 </style>

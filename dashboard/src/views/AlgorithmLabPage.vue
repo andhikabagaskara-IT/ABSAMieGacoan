@@ -2,18 +2,18 @@
   <div class="lab-page">
     <div class="section-title">
       <h2>⚡ Pengujian Model Sentimen</h2>
-      <p>Bandingkan performa algoritma klasifikasi dan lihat dampak SMOTE pada data imbalance.</p>
+      <p>Bandingkan performa algoritma klasifikasi dan lihat dampak SMOTE serta Stratified 5-Fold Cross-Validation pada data.</p>
     </div>
 
     <!-- Row 1: Models Comparison (Real Data) -->
     <div class="models-grid">
       <div class="model-wrapper">
         <ModelCard 
-          title="Naive Bayes"
-          :accuracy="98.82"
-          :precision="99.07"
-          :recall="99.59"
-          :f1Score="99.33"
+          title="Naive Bayes (Multinomial)"
+          :accuracy="97.37"
+          :precision="97.64"
+          :recall="97.37"
+          :f1Score="97.45"
           cmImage="/cm_nb.png"
           :isBest="false"
         />
@@ -21,10 +21,10 @@
       <div class="model-wrapper">
         <ModelCard 
           title="Support Vector Machine (SVM)"
-          :accuracy="99.62"
-          :precision="99.64"
-          :recall="99.93"
-          :f1Score="99.79"
+          :accuracy="99.00"
+          :precision="99.05"
+          :recall="99.00"
+          :f1Score="99.01"
           cmImage="/cm_svm.png"
           :isBest="true"
         />

@@ -163,13 +163,16 @@ onUnmounted(() => {
 }
 
 .mobile-toggle {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
   color: var(--text-primary);
   padding: 0.25rem;
   border-radius: var(--radius-md);
   cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .mobile-toggle:hover {
@@ -354,12 +357,6 @@ onUnmounted(() => {
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .mobile-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
   .app-header {
     padding: 0 1rem;
   }
