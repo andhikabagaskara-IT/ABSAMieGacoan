@@ -1,0 +1,32 @@
+======================================================================
+  ANALISIS ASPEK PER SENTIMEN (LDA + Klasifikasi)
+======================================================================
+
+
+──────────────────────────────────────────────────
+  Sentimen: POSITIF (45518 ulasan)
+──────────────────────────────────────────────────
+  Topik 5: 10471 ulasan (23.0%)
+    Keywords: makan, enak, banget, cepat, konsisten, kecewa, bintang, layan, ramah, bosen
+  Topik 1: 9929 ulasan (21.8%)
+    Keywords: enak, pedas, bumbu, banget, mienya, nyaman, pilih, murah, level, makan
+  Topik 2: 9731 ulasan (21.4%)
+    Keywords: enak, tempat, makan, layan, mie, bersih, banget, nyaman, nagih, cepat
+  Topik 4: 8306 ulasan (18.2%)
+    Keywords: mie, banget, makan, cocok, porsi, enak, kali, nongkrong, harga, surabaya
+  Topik 3: 7081 ulasan (15.6%)
+    Keywords: layan, ramah, makan, pesan, mie, banget, goreng, cepat, kecewa, mantap
+
+──────────────────────────────────────────────────
+  Sentimen: NEGATIF (6367 ulasan)
+──────────────────────────────────────────────────
+  Topik 2: 1995 ulasan (31.3%)
+    Keywords: enak, tempat, makan, layan, mie, bersih, banget, nyaman, nagih, cepat
+  Topik 3: 1909 ulasan (30.0%)
+    Keywords: layan, ramah, makan, pesan, mie, banget, goreng, cepat, kecewa, mantap
+  Topik 1: 1096 ulasan (17.2%)
+    Keywords: enak, pedas, bumbu, banget, mienya, nyaman, pilih, murah, level, makan
+  Topik 5: 1059 ulasan (16.6%)
+    Keywords: makan, enak, banget, cepat, konsisten, kecewa, bintang, layan, ramah, bosen
+  Topik 4: 308 ulasan (4.8%)
+    Keywords: mie, banget, makan, cocok, porsi, enak, kali, nongkrong, harga, surabaya

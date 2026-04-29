@@ -147,6 +147,222 @@
             "Topik 5": 841
         }
     },
+    "aspect_sentiment_cross": {
+        "positif": {
+            "Topik 5": 10471,
+            "Topik 1": 9929,
+            "Topik 2": 9731,
+            "Topik 4": 8306,
+            "Topik 3": 7081
+        },
+        "negatif": {
+            "Topik 2": 1995,
+            "Topik 3": 1909,
+            "Topik 1": 1096,
+            "Topik 5": 1059,
+            "Topik 4": 308
+        }
+    },
+    "kfold_results": {
+        "k_folds": 5,
+        "total_data": 51885,
+        "method": "Stratified 5-Fold Cross-Validation + SMOTE",
+        "svm": {
+            "fold_metrics": [
+                {
+                    "accuracy": 0.9911342391828082,
+                    "precision": 0.9914844962120173,
+                    "recall": 0.9911342391828082,
+                    "f1_score": 0.9912273019035432,
+                    "train_time": 475.5318455696106
+                },
+                {
+                    "accuracy": 0.989977835597957,
+                    "precision": 0.9904021296502074,
+                    "recall": 0.989977835597957,
+                    "f1_score": 0.9900925849148384,
+                    "train_time": 480.74444222450256
+                },
+                {
+                    "accuracy": 0.9889177989785102,
+                    "precision": 0.9895274117014663,
+                    "recall": 0.9889177989785102,
+                    "f1_score": 0.9890742857393493,
+                    "train_time": 321.0490503311157
+                },
+                {
+                    "accuracy": 0.9907487713211911,
+                    "precision": 0.9911226753984297,
+                    "recall": 0.9907487713211911,
+                    "f1_score": 0.9908487322014865,
+                    "train_time": 321.3064532279968
+                },
+                {
+                    "accuracy": 0.9894960007709357,
+                    "precision": 0.990012260526837,
+                    "recall": 0.9894960007709357,
+                    "f1_score": 0.9896310516661873,
+                    "train_time": 475.01845240592957
+                }
+            ],
+            "average": {
+                "accuracy": 0.9900549291702806,
+                "precision": 0.9905097946977914,
+                "recall": 0.9900549291702806,
+                "f1_score": 0.9901747912850809
+            },
+            "std": {
+                "accuracy": 0.0008071847968149694,
+                "precision": 0.0007141252215482043,
+                "recall": 0.0008071847968149694,
+                "f1_score": 0.0007842828670104512
+            },
+            "confusion_matrix": [
+                [
+                    6292,
+                    75
+                ],
+                [
+                    441,
+                    45077
+                ]
+            ]
+        },
+        "nb": {
+            "fold_metrics": [
+                {
+                    "accuracy": 0.97398091934085,
+                    "precision": 0.9765405858943403,
+                    "recall": 0.97398091934085,
+                    "f1_score": 0.9747025929653004,
+                    "train_time": 0.018251895904541016
+                },
+                {
+                    "accuracy": 0.9755227907873181,
+                    "precision": 0.9780032573603158,
+                    "recall": 0.9755227907873181,
+                    "f1_score": 0.9762016985673566,
+                    "train_time": 0.013241052627563477
+                },
+                {
+                    "accuracy": 0.9729208827214031,
+                    "precision": 0.9757544961591383,
+                    "recall": 0.9729208827214031,
+                    "f1_score": 0.973714507693377,
+                    "train_time": 0.015200376510620117
+                },
+                {
+                    "accuracy": 0.9722463139635733,
+                    "precision": 0.9750130576024929,
+                    "recall": 0.9722463139635733,
+                    "f1_score": 0.9730392393151347,
+                    "train_time": 0.017284154891967773
+                },
+                {
+                    "accuracy": 0.9741736532716585,
+                    "precision": 0.9769975927297864,
+                    "recall": 0.9741736532716585,
+                    "f1_score": 0.9749408845069173,
+                    "train_time": 0.014386415481567383
+                }
+            ],
+            "average": {
+                "accuracy": 0.9737689120169606,
+                "precision": 0.9764617979492147,
+                "recall": 0.9737689120169606,
+                "f1_score": 0.9745197846096172
+            },
+            "std": {
+                "accuracy": 0.0011244831566591244,
+                "precision": 0.001026499402603031,
+                "recall": 0.0011244831566591244,
+                "f1_score": 0.0010844412257467937
+            },
+            "confusion_matrix": [
+                [
+                    6147,
+                    220
+                ],
+                [
+                    1141,
+                    44377
+                ]
+            ]
+        }
+    },
+    "lda_results": {
+        "best_k": 5,
+        "best_dbi": 0.19487942751120121,
+        "dbi_scores": {
+            "3": 0.29828071042299714,
+            "4": 0.22574745221113962,
+            "5": 0.19487942751120121,
+            "6": 0.24680301410865202,
+            "7": 0.261378275033796
+        },
+        "topics_keywords": {
+            "Topik 1": [
+                "enak",
+                "pedas",
+                "bumbu",
+                "banget",
+                "mienya",
+                "nyaman",
+                "pilih",
+                "murah",
+                "level",
+                "makan"
+            ],
+            "Topik 2": [
+                "enak",
+                "tempat",
+                "makan",
+                "layan",
+                "mie",
+                "bersih",
+                "banget",
+                "nyaman",
+                "nagih",
+                "cepat"
+            ],
+            "Topik 3": [
+                "layan",
+                "ramah",
+                "makan",
+                "pesan",
+                "mie",
+                "banget",
+                "goreng",
+                "cepat",
+                "kecewa",
+                "mantap"
+            ],
+            "Topik 4": [
+                "mie",
+                "banget",
+                "makan",
+                "cocok",
+                "porsi",
+                "enak",
+                "kali",
+                "nongkrong",
+                "harga",
+                "surabaya"
+            ],
+            "Topik 5": [
+                "makan",
+                "enak",
+                "banget",
+                "cepat",
+                "konsisten",
+                "kecewa",
+                "bintang",
+                "layan",
+                "ramah",
+                "bosen"
+            ]
+        }
+    },
     "sample_reviews": [
         {
             "nama_cabang": "Mie Gacoan Kenjeran 2",
@@ -1233,7 +1449,7 @@
             "nama_pelanggan": "Dicky Cahyo",
             "tanggal_ulasan": "4 hari lalu",
             "rating": 5,
-            "teks_komentar": "Mie Gacoan Merr selalu bikin nagih.\nPedasnya mantap, udang kejunya lumer, dan ada juga udang rambutan serta lumpia udang yang enak banget. Tempatnya luas, self-service, dan cocok buat makan rame-rame.",
+            "teks_komentar": "Mie Gacoan Merr selalu bikin nagih.\r\nPedasnya mantap, udang kejunya lumer, dan ada juga udang rambutan serta lumpia udang yang enak banget. Tempatnya luas, self-service, dan cocok buat makan rame-rame.",
             "sentimen": "positif",
             "aspek_lda": "Topik 2"
         },
@@ -1944,7 +2160,7 @@
             "nama_pelanggan": "Salsabila Azzahra",
             "tanggal_ulasan": "5 bulan lalu",
             "rating": 5,
-            "teks_komentar": "Makanannya enak fresh semua 🩷\nBeda sama yang ada di kotaku sumpah real 😇",
+            "teks_komentar": "Makanannya enak fresh semua 🩷\r\nBeda sama yang ada di kotaku sumpah real 😇",
             "sentimen": "positif",
             "aspek_lda": "Topik 5"
         },
@@ -5274,7 +5490,7 @@
             "nama_pelanggan": "amirul hadi",
             "tanggal_ulasan": "7 bulan lalu",
             "rating": 5,
-            "teks_komentar": "Layanan bagus, makanan enak\nWaktu tunggu pesanan juga cepat",
+            "teks_komentar": "Layanan bagus, makanan enak\r\nWaktu tunggu pesanan juga cepat",
             "sentimen": "positif",
             "aspek_lda": "Topik 5"
         },

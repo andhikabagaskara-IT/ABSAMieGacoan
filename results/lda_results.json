@@ -1,0 +1,73 @@
+{
+    "best_k": 5,
+    "best_dbi": 0.19487942751120121,
+    "dbi_scores": {
+        "3": 0.29828071042299714,
+        "4": 0.22574745221113962,
+        "5": 0.19487942751120121,
+        "6": 0.24680301410865202,
+        "7": 0.261378275033796
+    },
+    "topics_keywords": {
+        "Topik 1": [
+            "enak",
+            "pedas",
+            "bumbu",
+            "banget",
+            "mienya",
+            "nyaman",
+            "pilih",
+            "murah",
+            "level",
+            "makan"
+        ],
+        "Topik 2": [
+            "enak",
+            "tempat",
+            "makan",
+            "layan",
+            "mie",
+            "bersih",
+            "banget",
+            "nyaman",
+            "nagih",
+            "cepat"
+        ],
+        "Topik 3": [
+            "layan",
+            "ramah",
+            "makan",
+            "pesan",
+            "mie",
+            "banget",
+            "goreng",
+            "cepat",
+            "kecewa",
+            "mantap"
+        ],
+        "Topik 4": [
+            "mie",
+            "banget",
+            "makan",
+            "cocok",
+            "porsi",
+            "enak",
+            "kali",
+            "nongkrong",
+            "harga",
+            "surabaya"
+        ],
+        "Topik 5": [
+            "makan",
+            "enak",
+            "banget",
+            "cepat",
+            "konsisten",
+            "kecewa",
+            "bintang",
+            "layan",
+            "ramah",
+            "bosen"
+        ]
+    }
+}

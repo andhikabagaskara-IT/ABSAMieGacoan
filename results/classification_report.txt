@@ -1,37 +1,87 @@
-=== LAPORAN PERBANDINGAN PERFORMA MODEL ===
+======================================================================
+  LAPORAN KLASIFIKASI SENTIMEN
+  Metode: Stratified 5-Fold Cross-Validation + SMOTE
+======================================================================
 
---- 1. SUPPORT VECTOR MACHINE (SVM) ---
-Waktu Training : 4.73 detik
-Accuracy       : 0.9962
-Precision      : 0.9964
-Recall         : 0.9993
-F1-Score       : 0.9979
+Total data      : 51885
+Jumlah Fold (K) : 5
+Max TF-IDF feat : 5000
+SMOTE           : Diterapkan hanya pada data Training tiap fold
+Total waktu     : 2085.32 detik (34.76 menit)
 
-Classification Report (SVM):
+----------------------------------------------------------------------
+  DETAIL METRIK PER FOLD
+----------------------------------------------------------------------
+
+  Fold 1:
+    SVM → Acc: 0.9911 | Prec: 0.9915 | Rec: 0.9911 | F1: 0.9912 | Time: 475.53s
+    NB  → Acc: 0.9740 | Prec: 0.9765 | Rec: 0.9740 | F1: 0.9747 | Time: 0.02s
+
+  Fold 2:
+    SVM → Acc: 0.9900 | Prec: 0.9904 | Rec: 0.9900 | F1: 0.9901 | Time: 480.74s
+    NB  → Acc: 0.9755 | Prec: 0.9780 | Rec: 0.9755 | F1: 0.9762 | Time: 0.01s
+
+  Fold 3:
+    SVM → Acc: 0.9889 | Prec: 0.9895 | Rec: 0.9889 | F1: 0.9891 | Time: 321.05s
+    NB  → Acc: 0.9729 | Prec: 0.9758 | Rec: 0.9729 | F1: 0.9737 | Time: 0.02s
+
+  Fold 4:
+    SVM → Acc: 0.9907 | Prec: 0.9911 | Rec: 0.9907 | F1: 0.9908 | Time: 321.31s
+    NB  → Acc: 0.9722 | Prec: 0.9750 | Rec: 0.9722 | F1: 0.9730 | Time: 0.02s
+
+  Fold 5:
+    SVM → Acc: 0.9895 | Prec: 0.9900 | Rec: 0.9895 | F1: 0.9896 | Time: 475.02s
+    NB  → Acc: 0.9742 | Prec: 0.9770 | Rec: 0.9742 | F1: 0.9749 | Time: 0.01s
+
+----------------------------------------------------------------------
+  RATA-RATA METRIK (MEAN ± STD)
+----------------------------------------------------------------------
+
+  1. SUPPORT VECTOR MACHINE (SVM)
+     Accuracy  : 0.9901 ± 0.0008
+     Precision : 0.9905 ± 0.0007
+     Recall    : 0.9901 ± 0.0008
+     F1-Score  : 0.9902 ± 0.0008
+
+  2. NAIVE BAYES (MULTINOMIAL)
+     Accuracy  : 0.9738 ± 0.0011
+     Precision : 0.9765 ± 0.0010
+     Recall    : 0.9738 ± 0.0011
+     F1-Score  : 0.9745 ± 0.0011
+
+----------------------------------------------------------------------
+  CLASSIFICATION REPORT (Akumulasi Semua Fold)
+----------------------------------------------------------------------
+
+  SVM:
               precision    recall  f1-score   support
 
-     negatif       1.00      0.97      0.98      1273
-     positif       1.00      1.00      1.00      9104
+     negatif     0.9345    0.9882    0.9606      6367
+     positif     0.9983    0.9903    0.9943     45518
 
-    accuracy                           1.00     10377
-   macro avg       1.00      0.99      0.99     10377
-weighted avg       1.00      1.00      1.00     10377
+    accuracy                         0.9901     51885
+   macro avg     0.9664    0.9893    0.9775     51885
+weighted avg     0.9905    0.9901    0.9902     51885
 
--------------------------------------------------
 
---- 2. NAIVE BAYES (MULTINOMIAL) ---
-Waktu Training : 0.09 detik
-Accuracy       : 0.9882
-Precision      : 0.9907
-Recall         : 0.9959
-F1-Score       : 0.9933
-
-Classification Report (Naive Bayes):
+  Naive Bayes:
               precision    recall  f1-score   support
 
-     negatif       0.97      0.93      0.95      1273
-     positif       0.99      1.00      0.99      9104
+     negatif     0.8434    0.9654    0.9003      6367
+     positif     0.9951    0.9749    0.9849     45518
 
-    accuracy                           0.99     10377
-   macro avg       0.98      0.96      0.97     10377
-weighted avg       0.99      0.99      0.99     10377
+    accuracy                         0.9738     51885
+   macro avg     0.9193    0.9702    0.9426     51885
+weighted avg     0.9765    0.9738    0.9745     51885
+
+----------------------------------------------------------------------
+  CONFUSION MATRIX (Akumulasi Semua Fold)
+----------------------------------------------------------------------
+
+  SVM:
+  [[ 6292    75]
+ [  441 45077]]
+
+  Naive Bayes:
+  [[ 6147   220]
+ [ 1141 44377]]
