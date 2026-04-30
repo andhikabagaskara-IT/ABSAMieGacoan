@@ -6,11 +6,11 @@ Selamat datang di repositori proyek **Analisis Sentimen Berbasis Aspek (Aspect-B
 
 Proyek machine learning ini dikembangkan secara *end-to-end* untuk menyelesaikan permasalahan di dunia nyata. Berikut adalah alur besar tahapannya:
 1. **Scraping Ulasan**: Mengumpulkan total target 60.000 ulasan dari 12 cabang Mie Gacoan di Surabaya menggunakan Selenium Python.
-2. **Pelabelan Sentimen**: Mengkategorikan ulasan secara otomatis menjadi **Positif**, **Negatif**, atau **Netral** berdasarkan rating bintang yang diberikan oleh pelanggan.
+2. **Pelabelan Sentimen**: Mengkategorikan ulasan secara otomatis menjadi **Positif**, **Negatif**, atau **Netral** berdasarkan kombinasi kata kunci dari teks komentar dan rating bintang yang diberikan oleh pelanggan.
 3. **Preprocessing Data (NLP)**: Memproses data teks ulasan yang berantakan menggunakan pipeline *Natural Language Processing* Bahasa Indonesia (Cleaning, Case Folding, Normalisasi Slang, Tokenizing, Stopword Removal, Stemming Sastrawi).
 4. **Klasifikasi Sentimen**: Melatih algoritma machine learning **Support Vector Machine (SVM)** dan membandingkannya dengan **Naive Bayes**.
-5. **Ekstraksi Aspek (Topic Modeling)**: Mengidentifikasi topik ulasan (seperti Rasa, Harga, Pelayanan, Kebersihan) menggunakan **Latent Dirichlet Allocation (LDA)**, yang dievaluasi kualitas clusteringnya menggunakan metrik *Davies-Bouldin Index (DBI)*.
-6. **Dashboard Interaktif**: Menyajikan insight sentimen dan metrik model dalam bentuk visualisasi web yang interaktif menggunakan **VueJS**.
+5. **Ekstraksi Aspek (Topic Modeling)**: Mengidentifikasi 4 topik/aspek utama ulasan (seperti Rasa, Harga, Pelayanan, Tempat) menggunakan **Latent Dirichlet Allocation (LDA)**, yang dievaluasi kualitas clusteringnya menggunakan metrik *Davies-Bouldin Index (DBI)*. Ekstraksi ini juga secara otomatis menghasilkan gambar Word Cloud.
+6. **Dashboard Interaktif**: Menyajikan insight sentimen dan metrik model dalam bentuk visualisasi web yang interaktif menggunakan **VueJS**, lengkap dengan animasi transisi Dark Mode dan penjelasan algoritma yang ramah pengguna.
 
 ## 📂 Struktur Folder Repositori
 

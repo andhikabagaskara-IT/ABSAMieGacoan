@@ -4,29 +4,37 @@
 
 
 ──────────────────────────────────────────────────
-  Sentimen: POSITIF (45518 ulasan)
+  Sentimen: POSITIF (46374 ulasan)
 ──────────────────────────────────────────────────
-  Topik 5: 10471 ulasan (23.0%)
-    Keywords: makan, enak, banget, cepat, konsisten, kecewa, bintang, layan, ramah, bosen
-  Topik 1: 9929 ulasan (21.8%)
-    Keywords: enak, pedas, bumbu, banget, mienya, nyaman, pilih, murah, level, makan
-  Topik 2: 9731 ulasan (21.4%)
-    Keywords: enak, tempat, makan, layan, mie, bersih, banget, nyaman, nagih, cepat
-  Topik 4: 8306 ulasan (18.2%)
-    Keywords: mie, banget, makan, cocok, porsi, enak, kali, nongkrong, harga, surabaya
-  Topik 3: 7081 ulasan (15.6%)
-    Keywords: layan, ramah, makan, pesan, mie, banget, goreng, cepat, kecewa, mantap
+  Topik 2: 18960 ulasan (40.9%)
+    Keywords: enak, banget, layan, mie, bersih, tempat, goreng, cepat, ramah, kadang
+  Topik 1: 10035 ulasan (21.6%)
+    Keywords: makan, mie, banget, layan, puas, enak, favorit, bosen, bumbu, bintang
+  Topik 4: 9431 ulasan (20.3%)
+    Keywords: makan, nyaman, cepat, tempat, banget, layan, enak, pilih, mie, suka
+  Topik 3: 7948 ulasan (17.1%)
+    Keywords: level, pedas, porsi, harga, mie, enak, lumayan, mienya, bumbu, kecewa
 
 ──────────────────────────────────────────────────
-  Sentimen: NEGATIF (6367 ulasan)
+  Sentimen: NETRAL (3163 ulasan)
 ──────────────────────────────────────────────────
-  Topik 2: 1995 ulasan (31.3%)
-    Keywords: enak, tempat, makan, layan, mie, bersih, banget, nyaman, nagih, cepat
-  Topik 3: 1909 ulasan (30.0%)
-    Keywords: layan, ramah, makan, pesan, mie, banget, goreng, cepat, kecewa, mantap
-  Topik 1: 1096 ulasan (17.2%)
-    Keywords: enak, pedas, bumbu, banget, mienya, nyaman, pilih, murah, level, makan
-  Topik 5: 1059 ulasan (16.6%)
-    Keywords: makan, enak, banget, cepat, konsisten, kecewa, bintang, layan, ramah, bosen
-  Topik 4: 308 ulasan (4.8%)
-    Keywords: mie, banget, makan, cocok, porsi, enak, kali, nongkrong, harga, surabaya
+  Topik 3: 1000 ulasan (31.6%)
+    Keywords: level, pedas, porsi, harga, mie, enak, lumayan, mienya, bumbu, kecewa
+  Topik 1: 881 ulasan (27.9%)
+    Keywords: makan, mie, banget, layan, puas, enak, favorit, bosen, bumbu, bintang
+  Topik 2: 661 ulasan (20.9%)
+    Keywords: enak, banget, layan, mie, bersih, tempat, goreng, cepat, ramah, kadang
+  Topik 4: 621 ulasan (19.6%)
+    Keywords: makan, nyaman, cepat, tempat, banget, layan, enak, pilih, mie, suka
+
+──────────────────────────────────────────────────
+  Sentimen: NEGATIF (8023 ulasan)
+──────────────────────────────────────────────────
+  Topik 1: 3313 ulasan (41.3%)
+    Keywords: makan, mie, banget, layan, puas, enak, favorit, bosen, bumbu, bintang
+  Topik 3: 1787 ulasan (22.3%)
+    Keywords: level, pedas, porsi, harga, mie, enak, lumayan, mienya, bumbu, kecewa
+  Topik 4: 1474 ulasan (18.4%)
+    Keywords: makan, nyaman, cepat, tempat, banget, layan, enak, pilih, mie, suka
+  Topik 2: 1449 ulasan (18.1%)
+    Keywords: enak, banget, layan, mie, bersih, tempat, goreng, cepat, ramah, kadang

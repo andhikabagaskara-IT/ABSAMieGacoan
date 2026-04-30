@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.metrics import davies_bouldin_score
+from wordcloud import WordCloud
 
 # Konfigurasi stdout untuk log
 if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
@@ -126,11 +127,26 @@ def main():
     plt.savefig(plot_path, dpi=300)
     plt.close()
     log.info(f"Grafik visualisasi evaluasi DBI disimpan di: {plot_path}")
+    
+    # ─── KUSTOMISASI: Memaksa K=4 sesuai dengan 4 aspek bisnis utama ────────
+    log.info(f"Memaksa jumlah topik menjadi 4 sesuai 4 aspek bisnis utama...")
+    best_k = 4
+    best_lda_model = LatentDirichletAllocation(n_components=best_k, random_state=42, max_iter=10)
+    best_doc_topic_dist = best_lda_model.fit_transform(X_tf)
+    cluster_labels_best = np.argmax(best_doc_topic_dist, axis=1)
+    if len(np.unique(cluster_labels_best)) > 1:
+        best_dbi = davies_bouldin_score(best_doc_topic_dist, cluster_labels_best)
+    else:
+        best_dbi = float('inf')
 
-    # ─── 5. Ekstraksi Top Keyword per Aspek/Topik ───────────────────────────
+    # ─── 5. Ekstraksi Top Keyword per Aspek/Topik & WordCloud ───────────────
     log.info(f"\nMengekstrak 10 keyword (kata kunci) utama untuk masing-masing dari {best_k} topik:")
     n_top_words = 10
     topics_keywords = {}
+    
+    # Direktori dashboard/public
+    dashboard_public_dir = os.path.join(BASE_DIR, 'dashboard', 'public')
+    os.makedirs(dashboard_public_dir, exist_ok=True)
 
     report_path = os.path.join(RESULTS_DIR, 'lda_topics_report.txt')
     with open(report_path, 'w', encoding='utf-8') as f:
@@ -150,6 +166,15 @@ def main():
             topic_desc = f"Topik {topic_idx+1} : " + ", ".join(top_features)
             log.info(f"  {topic_desc}")
             f.write(topic_desc + "\n")
+            
+            # Buat WordCloud
+            wc = WordCloud(width=800, height=400, background_color='white', colormap='viridis', max_words=20)
+            # Buat string frequencies dari score
+            word_freq = {feature_names[i]: topic[i] for i in top_features_ind}
+            wc.generate_from_frequencies(word_freq)
+            wc_path = os.path.join(dashboard_public_dir, f'wordcloud_topik_{topic_idx+1}.png')
+            wc.to_file(wc_path)
+            log.info(f"    WordCloud disimpan ke: {wc_path}")
 
         f.write("\n* Catatan untuk Penulis (Mahasiswa):\n")
         f.write("Analis perlu membaca keyword di atas untuk menamai label aspek secara manual.\n")

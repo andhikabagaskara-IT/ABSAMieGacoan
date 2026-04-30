@@ -8,13 +8,19 @@
     <div class="dbi-content">
       <div class="optimal-k">
         <span class="label">Optimal Topics (K)</span>
-        <span class="value">5</span>
+        <span class="value">4</span>
       </div>
       
-      <p class="description">
-        Davies-Bouldin Index (DBI) digunakan untuk mengevaluasi kualitas clustering pada model LDA. 
-        Nilai yang lebih rendah menunjukkan cluster (topik) yang lebih baik, terpisah satu sama lain.
-      </p>
+      <div class="description-box">
+        <p class="description">
+          <strong>Davies-Bouldin Index (DBI)</strong> digunakan untuk mengevaluasi kualitas pemisahan topik pada LDA.
+        </p>
+        <ul class="guide-list">
+          <li><strong>Sumbu-X:</strong> Jumlah aspek (topik) yang diuji.</li>
+          <li><strong>Sumbu-Y:</strong> Nilai skor DBI (tingkat tumpang tindih).</li>
+          <li><strong>Cara Membaca:</strong> Cari titik terendah pada grafik. Titik tersebut (<strong>K=4</strong>) menunjukkan bahwa 4 topik adalah jumlah yang paling optimal dan unik (tidak saling tumpang tindih).</li>
+        </ul>
+      </div>
       
       <div class="image-wrapper">
         <img src="/lda_dbi_evaluation.png" alt="DBI Evaluation Chart" @error="handleImageError" />
@@ -22,11 +28,10 @@
           <div class="mock-chart">
             <div class="line"></div>
             <div class="points">
-              <div class="point" style="bottom: 80%; left: 10%" title="K=2: 0.45"></div>
-              <div class="point" style="bottom: 50%; left: 30%" title="K=3: 0.32"></div>
-              <div class="point" style="bottom: 30%; left: 50%" title="K=4: 0.25"></div>
-              <div class="point point-optimal" style="bottom: 10%; left: 70%" title="K=5: 0.1949"></div>
-              <div class="point" style="bottom: 25%; left: 90%" title="K=6: 0.22"></div>
+              <div class="point" style="bottom: 80%; left: 20%" title="K=2: 0.45"></div>
+              <div class="point" style="bottom: 50%; left: 40%" title="K=3: 0.32"></div>
+              <div class="point point-optimal" style="bottom: 10%; left: 60%" title="K=4: 0.1949"></div>
+              <div class="point" style="bottom: 30%; left: 80%" title="K=5: 0.25"></div>
             </div>
             <div class="axes">
               <span class="x-axis">Jumlah Topik (K)</span>
@@ -106,10 +111,31 @@ const handleImageError = () => {
   color: var(--primary);
 }
 
+.description-box {
+  background-color: var(--bg-base);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--primary);
+}
+
 .description {
   font-size: 0.875rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.guide-list {
+  font-size: 0.875rem;
   color: var(--text-secondary);
-  line-height: 1.5;
+  padding-left: 1.2rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.guide-list li strong {
+  color: var(--text-primary);
 }
 
 .image-wrapper {

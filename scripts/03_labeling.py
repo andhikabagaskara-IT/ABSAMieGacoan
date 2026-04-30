@@ -45,22 +45,39 @@ def main():
     # Validasi tipe data rating
     df['rating'] = pd.to_numeric(df['rating'], errors='coerce')
     
-    # Filter rating (buang rating 3)
-    filtered_df = df[df['rating'] != 3].copy()
-    dropped_count = len(df) - len(filtered_df)
-    log.info(f"🧹 Membuang {dropped_count} ulasan dengan rating 3 (ambigu).")
-    log.info(f"📊 Total ulasan yang akan dilabeli: {len(filtered_df)}")
+    # List kata positif dan negatif sederhana
+    positive_words = ['enak', 'mantap', 'bagus', 'keren', 'suka', 'puas', 'cepat', 'ramah', 'lezat', 'murah', 'bersih', 'rekomendasi', 'terbaik', 'oke', 'sip', 'kren', 'good', 'worth', 'nyaman']
+    negative_words = ['jelek', 'buruk', 'kecewa', 'lama', 'kotor', 'mahal', 'kurang', 'lambat', 'keras', 'asin', 'pahit', 'basi', 'parah', 'payah', 'bau', 'nyamuk', 'kacau', 'bad', 'lelet']
     
-    # Beri label sentimen
-    # Rating 1-2 = negatif, 4-5 = positif
-    def label_sentiment(rating):
+    def label_sentiment(row):
+        rating = row['rating']
+        text = str(row['teks_komentar']).lower()
+        
+        pos_count = sum(1 for word in positive_words if word in text)
+        neg_count = sum(1 for word in negative_words if word in text)
+        
+        text_sentiment = 'netral'
+        if pos_count > neg_count:
+            text_sentiment = 'positif'
+        elif neg_count > pos_count:
+            text_sentiment = 'negatif'
+            
+        # Kombinasi rating dan teks
         if rating >= 4:
+            if text_sentiment == 'negatif':
+                return 'netral'
             return 'positif'
         elif rating <= 2:
+            if text_sentiment == 'positif':
+                return 'netral'
             return 'negatif'
-        return None
-        
-    filtered_df['sentimen'] = filtered_df['rating'].apply(label_sentiment)
+        else: # rating 3
+            return text_sentiment
+            
+    # Beri label sentimen
+    log.info("📊 Memproses pelabelan dengan 3 kelas (positif, negatif, netral) menggunakan rating dan teks komentar...")
+    filtered_df = df.copy()
+    filtered_df['sentimen'] = filtered_df.apply(label_sentiment, axis=1)
     
     # Hapus baris yang mungkin None (safety check)
     final_df = filtered_df.dropna(subset=['sentimen']).copy()
@@ -68,11 +85,11 @@ def main():
     # Tampilkan statistik
     stats = final_df['sentimen'].value_counts()
     log.info("========================================")
-    log.info("📈 DISTRIBUSI SENTIMEN")
+    log.info("📈 DISTRIBUSI SENTIMEN (3 KELAS)")
     log.info("========================================")
     for sentimen, count in stats.items():
         percentage = (count / len(final_df)) * 100
-        log.info(f"  - {sentimen.upper()}: {count} ulasan ({percentage:.1f}%)")
+        log.info(f"  - {str(sentimen).upper()}: {count} ulasan ({percentage:.1f}%)")
     log.info("========================================")
         
     # Simpan data yang sudah dilabeli

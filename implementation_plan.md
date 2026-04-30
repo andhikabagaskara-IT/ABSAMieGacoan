@@ -39,12 +39,13 @@ graph TD
 ## User Review Required
 
 > [!IMPORTANT]
-> **Pelabelan Sentimen Otomatis vs Manual**  
-> Dengan target 60.000 ulasan, pelabelan manual tidak realistis. Saya mengusulkan **pelabelan otomatis berbasis rating**:
+> **Pelabelan Sentimen Otomatis**  
+> Dengan target 60.000 ulasan, pelabelan manual tidak realistis. Saya mengusulkan **pelabelan otomatis berbasis kombinasi rating dan kata kunci (lexicon) dari teks komentar**:
 >
-> - ⭐ Rating 1-2 → **Negatif**
-> - ⭐ Rating 3 → **Netral**
-> - ⭐ Rating 4-5 → **Positif**
+> - Teks akan dicek kemunculan kata positif (enak, mantap, dll) dan negatif (kecewa, lama, dll).
+> - ⭐ Rating 1-2 → Cenderung **Negatif** (kecuali teks dominan positif, akan jadi netral)
+> - ⭐ Rating 3 → Berdasarkan sentimen teks (Positif / Negatif / **Netral**)
+> - ⭐ Rating 4-5 → Cenderung **Positif** (kecuali teks dominan negatif, akan jadi netral)
 >
 > Sistem sekarang dikonfigurasi untuk menggunakan 3 kelas tersebut.
 
@@ -152,15 +153,16 @@ Script scraping yang diperbaiki dan ditingkatkan:
 
 ### Tahap 3: Pelabelan Data
 
-#### [EXISTING] scripts/03_labeling.py
+#### [UPDATED] scripts/03_labeling.py
 
 - Membaca data dari `data/combined/all_reviews.csv`
-- Labeling otomatis berdasarkan rating:
-  - Rating 1-2 → `negatif`
-  - Rating 3 → `netral`
-  - Rating 4-5 → `positif`
+- Labeling otomatis berdasarkan **kombinasi rating dan teks komentar**:
+  - Deteksi kata positif/negatif sederhana pada `teks_komentar`
+  - Rating 1-2 + teks negatif/netral → `negatif`
+  - Rating 4-5 + teks positif/netral → `positif`
+  - Sisanya atau jika rating dan teks kontradiktif → `netral`
 - Output: `data/labeled/labeled_reviews.csv`
-- Statistik distribusi label
+- Statistik distribusi label (3 Kelas)
 
 ---
 
@@ -216,14 +218,16 @@ Output:
 #### [UPDATED] scripts/06_lda_aspect.py
 
 - CountVectorizer + LDA topic modeling
-- Eksperimen jumlah topik optimal (3, 4, 5, 6, 7)
-- Evaluasi menggunakan **Davies-Bouldin Index (DBI)**
+- Eksperimen jumlah topik optimal dan evaluasi menggunakan **Davies-Bouldin Index (DBI)**
+- **Memaksa (Force) ekstraksi ke 4 aspek utama** sesuai kebutuhan bisnis
+- Generate **Word Cloud** otomatis dan menyimpannya ke `dashboard/public` untuk ditampilkan di UI
 - Identifikasi aspek dominan dan keyword per topik
 - **Analisis aspek per sentimen** — membedah topik/aspek apa yang sering muncul pada sentimen positif atau negatif
 - Export `lda_results.json` untuk dashboard
 
 Output:
 - `data/preprocessed/reviews_with_aspects.csv` — Dataset master dengan sentimen + aspek
+- `dashboard/public/wordcloud_topik_X.png` — Gambar word cloud tiap aspek
 - `models/lda_count_vectorizer.pkl` — CountVectorizer
 - `models/lda_model.pkl` — Model LDA terbaik
 - `results/lda_dbi_evaluation.png` — Grafik DBI
@@ -276,10 +280,11 @@ Fitur-fitur dashboard untuk manajemen restoran:
    - Grafik perbandingan metrik per fold
 
 4. **Analisis Aspek (LDA)**
-   - Daftar aspek yang ditemukan
-   - Word cloud per aspek
+   - Daftar 4 aspek utama yang ditemukan
+   - Word cloud dinamis per aspek (hasil generate script Python)
    - Distribusi sentimen per aspek
-   - DBI score dan evaluasi
+   - Evaluasi DBI score beserta panduan cara membacanya
+   - Penjelasan pemahaman konsep mekanisme LDA & DBI bagi end-user
    - Aspek mana yang perlu perbaikan
 
 5. **Tool Analisis Sentimen Real-time**

@@ -45,8 +45,7 @@ const keywordData = {
   'Topik 1': ['enak', 'pedas', 'bumbu', 'mienya', 'nyaman', 'level', 'meresap', 'khas', 'gurih', 'mantap'],
   'Topik 2': ['tempat', 'bersih', 'nyaman', 'makan', 'luas', 'nagih', 'parkir', 'cozy', 'keluarga', 'suasana'],
   'Topik 3': ['layan', 'ramah', 'cepat', 'pesan', 'goreng', 'kecewa', 'antri', 'kasir', 'staf', 'sopan'],
-  'Topik 4': ['mie', 'porsi', 'harga', 'cocok', 'nongkrong', 'surabaya', 'terjangkau', 'murah', 'pas', 'banyak'],
-  'Topik 5': ['makan', 'konsisten', 'bintang', 'kecewa', 'enak', 'cepat', 'rekomendasi', 'langganan', 'kualitas', 'puas']
+  'Topik 4': ['mie', 'porsi', 'harga', 'cocok', 'nongkrong', 'surabaya', 'terjangkau', 'murah', 'pas', 'banyak']
 }
 
 const currentWords = computed(() => {

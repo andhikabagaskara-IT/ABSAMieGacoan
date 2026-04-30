@@ -13,7 +13,7 @@ graph TD
     subgraph "Machine Learning Modeling"
         D --> E[05_classification.py<br/>Stratified K-Fold CV + SMOTE]
         E --> F[06_lda_aspect.py<br/>Ekstraksi Aspek LDA]
-        
+
         subgraph "Detail Klasifikasi"
             E1[Inisialisasi Stratified K-Fold K=5] --> E2[Loop Fold 1..K]
             E2 --> E3[TF-IDF Vectorization]
@@ -38,11 +38,12 @@ graph TD
 ```
 
 ## Deskripsi Flow
+
 1. **Scraping**: Pengumpulan data mentah dari ulasan Google Maps.
 2. **Quality Check**: Pembersihan duplikat, pengecekan nilai null, dan menggabungkan semua data.
-3. **Labeling**: Pelabelan ke kelas Positif, Negatif, Netral berdasarkan rating bintang.
+3. **Labeling**: Pelabelan ke kelas Positif, Negatif, Netral berdasarkan kombinasi rating bintang dan sentimen teks komentar (lexicon matching).
 4. **Preprocessing**: Pembersihan teks, stemming, tokenizing.
 5. **Classification**: Melatih model dengan mengatasi ketidakseimbangan data (SMOTE) dan divalidasi dengan K-Fold untuk hasil objektif.
-6. **LDA Aspect**: Mengekstrak topik yang sering dibicarakan (Rasa, Harga, dll).
+6. **LDA Aspect**: Mengekstrak 4 topik utama secara dinamis yang sering dibicarakan (Rasa, Harga, dll) beserta pembuatan Word Cloud untuk visualisasi.
 7. **Export**: Mempersiapkan dataset JSON akhir.
-8. **Dashboard**: Menampilkan metrik, analisis cabang, performa algoritma, dan tool sentimen.
+8. **Dashboard**: Menampilkan metrik, analisis cabang, performa algoritma, evaluasi DBI, dan tool sentimen secara interaktif dengan dukungan *Dark Mode*.

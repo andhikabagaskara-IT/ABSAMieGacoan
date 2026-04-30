@@ -3,51 +3,51 @@
   Metode: Stratified 5-Fold Cross-Validation + SMOTE
 ======================================================================
 
-Total data      : 51885
+Total data      : 54397
 Jumlah Fold (K) : 5
 Max TF-IDF feat : 5000
 SMOTE           : Diterapkan hanya pada data Training tiap fold
-Total waktu     : 2085.32 detik (34.76 menit)
+Total waktu     : 1743.78 detik (29.06 menit)
 
 ----------------------------------------------------------------------
   DETAIL METRIK PER FOLD
 ----------------------------------------------------------------------
 
   Fold 1:
-    SVM → Acc: 0.9911 | Prec: 0.9915 | Rec: 0.9911 | F1: 0.9912 | Time: 475.53s
-    NB  → Acc: 0.9740 | Prec: 0.9765 | Rec: 0.9740 | F1: 0.9747 | Time: 0.02s
+    SVM → Acc: 0.9902 | Prec: 0.9906 | Rec: 0.9902 | F1: 0.9903 | Time: 344.28s
+    NB  → Acc: 0.9571 | Prec: 0.9644 | Rec: 0.9571 | F1: 0.9589 | Time: 0.02s
 
   Fold 2:
-    SVM → Acc: 0.9900 | Prec: 0.9904 | Rec: 0.9900 | F1: 0.9901 | Time: 480.74s
-    NB  → Acc: 0.9755 | Prec: 0.9780 | Rec: 0.9755 | F1: 0.9762 | Time: 0.01s
+    SVM → Acc: 0.9896 | Prec: 0.9900 | Rec: 0.9896 | F1: 0.9897 | Time: 333.22s
+    NB  → Acc: 0.9594 | Prec: 0.9661 | Rec: 0.9594 | F1: 0.9610 | Time: 0.01s
 
   Fold 3:
-    SVM → Acc: 0.9889 | Prec: 0.9895 | Rec: 0.9889 | F1: 0.9891 | Time: 321.05s
-    NB  → Acc: 0.9729 | Prec: 0.9758 | Rec: 0.9729 | F1: 0.9737 | Time: 0.02s
+    SVM → Acc: 0.9905 | Prec: 0.9909 | Rec: 0.9905 | F1: 0.9906 | Time: 336.83s
+    NB  → Acc: 0.9574 | Prec: 0.9646 | Rec: 0.9574 | F1: 0.9592 | Time: 0.02s
 
   Fold 4:
-    SVM → Acc: 0.9907 | Prec: 0.9911 | Rec: 0.9907 | F1: 0.9908 | Time: 321.31s
-    NB  → Acc: 0.9722 | Prec: 0.9750 | Rec: 0.9722 | F1: 0.9730 | Time: 0.02s
+    SVM → Acc: 0.9919 | Prec: 0.9922 | Rec: 0.9919 | F1: 0.9920 | Time: 354.17s
+    NB  → Acc: 0.9589 | Prec: 0.9657 | Rec: 0.9589 | F1: 0.9606 | Time: 0.02s
 
   Fold 5:
-    SVM → Acc: 0.9895 | Prec: 0.9900 | Rec: 0.9895 | F1: 0.9896 | Time: 475.02s
-    NB  → Acc: 0.9742 | Prec: 0.9770 | Rec: 0.9742 | F1: 0.9749 | Time: 0.01s
+    SVM → Acc: 0.9928 | Prec: 0.9930 | Rec: 0.9928 | F1: 0.9929 | Time: 360.52s
+    NB  → Acc: 0.9595 | Prec: 0.9659 | Rec: 0.9595 | F1: 0.9611 | Time: 0.02s
 
 ----------------------------------------------------------------------
   RATA-RATA METRIK (MEAN ± STD)
 ----------------------------------------------------------------------
 
   1. SUPPORT VECTOR MACHINE (SVM)
-     Accuracy  : 0.9901 ± 0.0008
-     Precision : 0.9905 ± 0.0007
-     Recall    : 0.9901 ± 0.0008
-     F1-Score  : 0.9902 ± 0.0008
+     Accuracy  : 0.9910 ± 0.0012
+     Precision : 0.9913 ± 0.0011
+     Recall    : 0.9910 ± 0.0012
+     F1-Score  : 0.9911 ± 0.0012
 
   2. NAIVE BAYES (MULTINOMIAL)
-     Accuracy  : 0.9738 ± 0.0011
-     Precision : 0.9765 ± 0.0010
-     Recall    : 0.9738 ± 0.0011
-     F1-Score  : 0.9745 ± 0.0011
+     Accuracy  : 0.9585 ± 0.0010
+     Precision : 0.9654 ± 0.0007
+     Recall    : 0.9585 ± 0.0010
+     F1-Score  : 0.9602 ± 0.0009
 
 ----------------------------------------------------------------------
   CLASSIFICATION REPORT (Akumulasi Semua Fold)
@@ -56,32 +56,32 @@ Total waktu     : 2085.32 detik (34.76 menit)
   SVM:
               precision    recall  f1-score   support
 
-     negatif     0.9345    0.9882    0.9606      6367
-     positif     0.9983    0.9903    0.9943     45518
+     negatif     0.9506    0.9905    0.9702      8023
+     positif     0.9983    0.9911    0.9947     46374
 
-    accuracy                         0.9901     51885
-   macro avg     0.9664    0.9893    0.9775     51885
-weighted avg     0.9905    0.9901    0.9902     51885
+    accuracy                         0.9910     54397
+   macro avg     0.9745    0.9908    0.9824     54397
+weighted avg     0.9913    0.9910    0.9911     54397
 
 
   Naive Bayes:
               precision    recall  f1-score   support
 
-     negatif     0.8434    0.9654    0.9003      6367
-     positif     0.9951    0.9749    0.9849     45518
+     negatif     0.7920    0.9742    0.8737      8023
+     positif     0.9954    0.9557    0.9751     46374
 
-    accuracy                         0.9738     51885
-   macro avg     0.9193    0.9702    0.9426     51885
-weighted avg     0.9765    0.9738    0.9745     51885
+    accuracy                         0.9585     54397
+   macro avg     0.8937    0.9650    0.9244     54397
+weighted avg     0.9654    0.9585    0.9602     54397
 
 ----------------------------------------------------------------------
   CONFUSION MATRIX (Akumulasi Semua Fold)
 ----------------------------------------------------------------------
 
   SVM:
-  [[ 6292    75]
- [  441 45077]]
+  [[ 7947    76]
+ [  413 45961]]
 
   Naive Bayes:
-  [[ 6147   220]
- [ 1141 44377]]
+  [[ 7816   207]
+ [ 2053 44321]]

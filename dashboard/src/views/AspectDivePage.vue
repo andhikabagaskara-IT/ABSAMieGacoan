@@ -31,6 +31,24 @@
         <DbiEvaluationCard />
       </div>
     </div>
+    <!-- Row 3: Summary Explanation -->
+    <div class="summary-row">
+      <div class="summary-card card">
+        <h3 class="card-title">Pemahaman Konsep: Apa itu LDA & DBI?</h3>
+        <div class="summary-content">
+          <div class="concept-block">
+            <h4>🔍 Latent Dirichlet Allocation (LDA)</h4>
+            <p><strong>Peran:</strong> LDA adalah algoritma pemodelan topik yang secara otomatis menemukan kelompok kata atau topik tersembunyi (aspek bisnis) dari ribuan ulasan pelanggan.</p>
+            <p><strong>Mekanisme:</strong> LDA memindai seluruh kata dalam teks, mencari pola kata yang sering muncul bersamaan, lalu mengelompokkannya menjadi satu topik (misal kumpulan kata "enak", "pedas" dikelompokkan menjadi Aspek Rasa).</p>
+          </div>
+          <div class="concept-block">
+            <h4>📊 Davies-Bouldin Index (DBI)</h4>
+            <p><strong>Peran:</strong> DBI adalah skor metrik evaluasi untuk menilai seberapa bagus pemisahan topik yang dihasilkan oleh LDA.</p>
+            <p><strong>Mekanisme:</strong> DBI menghitung jarak antar topik dan kerapatan dalam satu topik. Nilai DBI yang <strong>lebih rendah</strong> menandakan hasil pengelompokan yang lebih baik, artinya setiap aspek benar-benar berbeda dan tidak tumpang tindih.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -132,6 +150,10 @@ const filteredBranchAspectData = computed(() => {
   .branch-aspect-wrapper {
     height: 400px;
   }
+  
+  .summary-content {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 576px) {
@@ -143,5 +165,47 @@ const filteredBranchAspectData = computed(() => {
   .select-field {
     width: 100%;
   }
+}
+
+.summary-row {
+  margin-top: 1rem;
+}
+
+.summary-card {
+  padding: 1.5rem;
+}
+
+.summary-card .card-title {
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  color: var(--primary);
+  border-bottom: 2px solid var(--bg-subtle);
+  padding-bottom: 0.5rem;
+}
+
+.summary-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.concept-block h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+}
+
+.concept-block p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.concept-block strong {
+  color: var(--text-primary);
 }
 </style>
