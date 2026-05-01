@@ -16,20 +16,31 @@ ChartJS.register(ArcElement, Tooltip, Legend)
 
 const props = defineProps({
   positif: { type: Number, required: true },
-  negatif: { type: Number, required: true }
+  negatif: { type: Number, required: true },
+  netral: { type: Number, default: 0 }
 })
 
-const chartData = computed(() => ({
-  labels: ['Positif', 'Negatif'],
-  datasets: [
-    {
-      backgroundColor: ['#03A9F4', '#EC407A'],
-      borderWidth: 0,
-      hoverOffset: 4,
-      data: [props.positif, props.negatif]
-    }
-  ]
-}))
+const chartData = computed(() => {
+  const labels = ['Positif', 'Netral', 'Negatif']
+  const data = [props.positif, props.netral, props.negatif]
+  const colors = ['#10B981', '#F59E0B', '#EF4444']
+  
+  // Filter out zero values to keep chart clean
+  const filtered = labels.map((label, i) => ({ label, data: data[i], color: colors[i] }))
+    .filter(item => item.data > 0)
+
+  return {
+    labels: filtered.map(i => i.label),
+    datasets: [
+      {
+        backgroundColor: filtered.map(i => i.color),
+        borderWidth: 0,
+        hoverOffset: 4,
+        data: filtered.map(i => i.data)
+      }
+    ]
+  }
+})
 
 const chartOptions = {
   responsive: true,

@@ -1,13 +1,14 @@
 === LAPORAN HASIL LDA (TOPIC MODELING) ===
-Jumlah Aspek/Topik Terbaik : 4
-Skor DBI Terbaik           : 0.3361
+Jumlah Aspek/Topik Terbaik : 5
+Skor DBI Terbaik           : 0.2823
 
 Daftar Keyword Berdasarkan Topik Terbentuk:
 
-Topik 1 : makan, mie, banget, layan, puas, enak, favorit, bosen, bumbu, bintang
-Topik 2 : enak, banget, layan, mie, bersih, tempat, goreng, cepat, ramah, kadang
-Topik 3 : level, pedas, porsi, harga, mie, enak, lumayan, mienya, bumbu, kecewa
-Topik 4 : makan, nyaman, cepat, tempat, banget, layan, enak, pilih, mie, suka
+Topik 1 : keluarga, anak, bagus, nyaman, suka, mie, tempat, lumayan, goreng, nagih
+Topik 2 : makan, enak, mie, layan, nyaman, banget, tempat, mienya, parkir, cepat
+Topik 3 : layan, banget, cepat, makan, oke, ramah, kali, es, kunjung, teh
+Topik 4 : banget, pedas, level, enak, bumbu, harga, makan, mie, mienya, pas
+Topik 5 : enak, makan, kadang, konsisten, banget, favorit, pesan, kecewa, bosen, rame
 
 * Catatan untuk Penulis (Mahasiswa):
 Analis perlu membaca keyword di atas untuk menamai label aspek secara manual.

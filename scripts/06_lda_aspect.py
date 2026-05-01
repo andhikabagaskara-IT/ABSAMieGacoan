@@ -73,7 +73,8 @@ def main():
     feature_names = vectorizer.get_feature_names_out()
 
     # ─── 3. Eksperimen Jumlah Topik & Evaluasi DBI ──────────────────────────
-    num_topics_list = [3, 4, 5, 6, 7]
+    # Rentang pencarian topik yang lebih luas — LDA akan memilih K optimal secara otomatis
+    num_topics_list = [3, 4, 5, 6, 7, 8, 9, 10]
     dbi_scores = []
     best_dbi = float('inf')  # Metrik DBI: Semakin kecil nilainya, semakin baik clustering/klasifikasi aspeknya
     best_k = 3
@@ -81,6 +82,7 @@ def main():
     best_doc_topic_dist = None
 
     log.info("Memulai eksperimen pencarian jumlah topik optimal berdasarkan skor DBI...")
+    log.info(f"Rentang K yang diuji: {num_topics_list}")
 
     for k in num_topics_list:
         log.info(f"  -> Melatih LDA dengan jumlah aspek (n_components) = {k} ...")
@@ -109,13 +111,15 @@ def main():
             best_doc_topic_dist = doc_topic_dist
 
     log.info(f"\n✅ PENCARIAN SELESAI: Jumlah Aspek/Topik terbaik adalah {best_k} dengan skor DBI terendah = {best_dbi:.4f}")
+    log.info(f"   (LDA TIDAK dipaksa ke jumlah topik tertentu — hasilnya murni dari evaluasi DBI)")
 
     # ─── 4. Visualisasi Grafik DBI Evaluasi ─────────────────────────────────
-    plt.figure(figsize=(8, 5))
+    plt.figure(figsize=(10, 6))
     plt.plot(num_topics_list, dbi_scores, marker='o', linestyle='dashed', color='b', linewidth=2, markersize=8)
     plt.title('Evaluasi Jumlah Topik (LDA) Menggunakan Davies-Bouldin Index')
     plt.xlabel('Jumlah Topik / Aspek (K)')
     plt.ylabel('Skor DBI (Lebih Rendah = Lebih Baik)')
+    plt.xticks(num_topics_list)
     plt.grid(True, linestyle='--', alpha=0.7)
 
     # Beri anotasi titik terbaik
@@ -127,17 +131,6 @@ def main():
     plt.savefig(plot_path, dpi=300)
     plt.close()
     log.info(f"Grafik visualisasi evaluasi DBI disimpan di: {plot_path}")
-    
-    # ─── KUSTOMISASI: Memaksa K=4 sesuai dengan 4 aspek bisnis utama ────────
-    log.info(f"Memaksa jumlah topik menjadi 4 sesuai 4 aspek bisnis utama...")
-    best_k = 4
-    best_lda_model = LatentDirichletAllocation(n_components=best_k, random_state=42, max_iter=10)
-    best_doc_topic_dist = best_lda_model.fit_transform(X_tf)
-    cluster_labels_best = np.argmax(best_doc_topic_dist, axis=1)
-    if len(np.unique(cluster_labels_best)) > 1:
-        best_dbi = davies_bouldin_score(best_doc_topic_dist, cluster_labels_best)
-    else:
-        best_dbi = float('inf')
 
     # ─── 5. Ekstraksi Top Keyword per Aspek/Topik & WordCloud ───────────────
     log.info(f"\nMengekstrak 10 keyword (kata kunci) utama untuk masing-masing dari {best_k} topik:")

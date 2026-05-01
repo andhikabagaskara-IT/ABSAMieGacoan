@@ -10,14 +10,21 @@
       <StatCard 
         label="Sentimen Positif" 
         :value="`${sentimentPercentage.positif}%`" 
-        :subtitle="`${formatNumber(sentimentDistribution.positif)} ulasan`"
+        :subtitle="`${formatNumber(sentimentDistribution.positif || 0)} ulasan`"
         type="positive"
         :icon="Smile" 
       />
       <StatCard 
+        label="Sentimen Netral" 
+        :value="`${sentimentPercentage.netral}%`" 
+        :subtitle="`${formatNumber(sentimentDistribution.netral || 0)} ulasan`"
+        type="warning"
+        :icon="Meh" 
+      />
+      <StatCard 
         label="Sentimen Negatif" 
         :value="`${sentimentPercentage.negatif}%`" 
-        :subtitle="`${formatNumber(sentimentDistribution.negatif)} ulasan`"
+        :subtitle="`${formatNumber(sentimentDistribution.negatif || 0)} ulasan`"
         type="negative"
         :icon="Frown" 
       />
@@ -35,8 +42,9 @@
       </div>
       <div class="donut-chart-wrapper">
         <SentimentDonut 
-          :positif="sentimentDistribution.positif" 
-          :negatif="sentimentDistribution.negatif" 
+          :positif="sentimentDistribution.positif || 0" 
+          :negatif="sentimentDistribution.negatif || 0" 
+          :netral="sentimentDistribution.netral || 0"
         />
       </div>
     </div>
@@ -54,7 +62,7 @@
 </template>
 
 <script setup>
-import { MessageSquare, Smile, Frown, Store } from 'lucide-vue-next'
+import { MessageSquare, Smile, Meh, Frown, Store } from 'lucide-vue-next'
 import { useDashboardData } from '../composables/useDashboardData'
 import StatCard from '../components/cards/StatCard.vue'
 import SentimentDonut from '../components/charts/SentimentDonut.vue'
@@ -85,7 +93,7 @@ const formatNumber = (num) => {
 /* KPI Grid */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1.5rem;
 }
 

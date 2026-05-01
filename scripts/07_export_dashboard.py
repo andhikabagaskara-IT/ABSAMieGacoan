@@ -122,19 +122,20 @@ def main():
     else:
         log.warning(f" -> File LDA results tidak ditemukan: {lda_json_path}")
 
-    # ─── 8. Export Sampel Data Detail untuk Tabel "Data Explorer" ──────────
-    log.info(" -> Mengambil 1500 sampel ulasan representatif untuk tabel explorer UI...")
-    sample_size = min(1500, len(df))
+    # ─── 8. Export SELURUH Data Detail untuk Tabel "Data Explorer" ──────────
+    log.info(f" -> Mengekspor SELURUH {len(df)} ulasan untuk tabel explorer UI (tanpa sampling)...")
     # Buang kolom yang tidak perlu ditampilkan di tabel frontend (seperti text_preprocessed, dsb)
     display_columns = [col for col in [
         'nama_cabang', 'nama_pelanggan', 'tanggal_ulasan', 'rating',
         'teks_komentar', 'sentimen', 'aspek_lda'
     ] if col in df.columns]
 
-    sample_df = df.sample(sample_size, random_state=42)[display_columns]
+    all_display_df = df[display_columns].copy()
     # Handle masalah format data kosong/nan
-    sample_df = sample_df.fillna("Tidak Ada Data")
-    export_data['sample_reviews'] = sample_df.to_dict(orient='records')
+    all_display_df = all_display_df.fillna("Tidak Ada Data")
+    # Bersihkan label sentimen — pastikan hanya text (positif/negatif/netral), tanpa emoticon
+    all_display_df['sentimen'] = all_display_df['sentimen'].astype(str).str.strip().str.lower()
+    export_data['sample_reviews'] = all_display_df.to_dict(orient='records')
 
     # ─── 9. Simpan Semuanya ke JSON ────────────────────────────────────────
     output_path = os.path.join(EXPORT_DIR, 'dashboard_data.json')

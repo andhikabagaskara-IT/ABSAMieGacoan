@@ -26,15 +26,19 @@ graph TD
 
     subgraph "Presentation Layer"
         F --> G[07_export_dashboard.py<br/>Export JSON Dashboard]
-        G --> H[Dashboard VueJS<br/>Visualisasi Interaktif]
+        G --> H[Backend Flask API<br/>RESTful Services]
+        H --> I[Dashboard VueJS<br/>Visualisasi Interaktif]
+        G -.-> I
     end
 
     classDef python fill:#4FC3F7,stroke:#0288D1,stroke-width:2px,color:#000
     classDef output fill:#81C784,stroke:#388E3C,stroke-width:2px,color:#000
     classDef ui fill:#FFB74D,stroke:#F57C00,stroke-width:2px,color:#000
+    classDef backend fill:#CE93D8,stroke:#8E24AA,stroke-width:2px,color:#000
 
     class A,B,C,D,E,F,G python
-    class H ui
+    class H backend
+    class I ui
 ```
 
 ## Deskripsi Flow
@@ -44,6 +48,7 @@ graph TD
 3. **Labeling**: Pelabelan ke kelas Positif, Negatif, Netral berdasarkan kombinasi rating bintang dan sentimen teks komentar (lexicon matching).
 4. **Preprocessing**: Pembersihan teks, stemming, tokenizing.
 5. **Classification**: Melatih model dengan mengatasi ketidakseimbangan data (SMOTE) dan divalidasi dengan K-Fold untuk hasil objektif.
-6. **LDA Aspect**: Mengekstrak 4 topik utama secara dinamis yang sering dibicarakan (Rasa, Harga, dll) beserta pembuatan Word Cloud untuk visualisasi.
+6. **LDA Aspect**: Mengekstrak topik utama secara dinamis berdasarkan skor evaluasi DBI terendah (Range K=3-10) beserta pembuatan Word Cloud untuk visualisasi.
 7. **Export**: Mempersiapkan dataset JSON akhir.
-8. **Dashboard**: Menampilkan metrik, analisis cabang, performa algoritma, evaluasi DBI, dan tool sentimen secara interaktif dengan dukungan *Dark Mode*.
+8. **Backend API**: Menyiapkan REST API (Flask) untuk mengelola data ekspor secara terpusat.
+9. **Dashboard**: Menampilkan metrik (Positif, Negatif, Netral), analisis cabang dengan sampel seimbang, performa algoritma, evaluasi DBI, dan tool sentimen secara interaktif dengan dukungan *Dark Mode*.

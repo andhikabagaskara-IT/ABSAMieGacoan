@@ -7,12 +7,12 @@ const state = reactive({
   error: null
 })
 
-// Aspect Label Mapping based on LDA evaluation
-const ASPECT_LABELS = {
-  'Topik 1': 'Rasa & Bumbu',
-  'Topik 2': 'Tempat & Kebersihan',
-  'Topik 3': 'Pelayanan',
-  'Topik 4': 'Harga & Porsi'
+// Default fallback aspect labels — will be overridden dynamically from LDA results
+const DEFAULT_ASPECT_LABELS = {
+  'Topik 1': 'Topik 1',
+  'Topik 2': 'Topik 2',
+  'Topik 3': 'Topik 3',
+  'Topik 4': 'Topik 4'
 }
 
 let isFetching = false
@@ -46,15 +46,17 @@ export function useDashboardData() {
   // Computed properties for easy access to specific data parts
   const totalReviews = computed(() => state.data?.total_reviews || 0)
   
-  const sentimentDistribution = computed(() => state.data?.sentiment_distribution || { positif: 0, negatif: 0 })
+  const sentimentDistribution = computed(() => state.data?.sentiment_distribution || { positif: 0, negatif: 0, netral: 0 })
   
   const sentimentPercentage = computed(() => {
-    const total = sentimentDistribution.value.positif + sentimentDistribution.value.negatif
-    if (total === 0) return { positif: 0, negatif: 0 }
+    const dist = sentimentDistribution.value
+    const total = (dist.positif || 0) + (dist.negatif || 0) + (dist.netral || 0)
+    if (total === 0) return { positif: 0, negatif: 0, netral: 0 }
     
     return {
-      positif: ((sentimentDistribution.value.positif / total) * 100).toFixed(1),
-      negatif: ((sentimentDistribution.value.negatif / total) * 100).toFixed(1)
+      positif: ((dist.positif / total) * 100).toFixed(1),
+      negatif: ((dist.negatif / total) * 100).toFixed(1),
+      netral: ((dist.netral / total) * 100).toFixed(1)
     }
   })
   
@@ -68,7 +70,39 @@ export function useDashboardData() {
   
   const sampleReviews = computed(() => state.data?.sample_reviews || [])
 
-  const getAspectLabel = (topicId) => ASPECT_LABELS[topicId] || topicId
+  // Dynamic ASPECT_LABELS — built from LDA results topics_keywords
+  // Generates labels like "Topik 1", "Topik 2" etc based on how many topics LDA found
+  const ASPECT_LABELS = computed(() => {
+    const ldaResults = state.data?.lda_results
+    if (ldaResults && ldaResults.topics_keywords) {
+      const labels = {}
+      Object.keys(ldaResults.topics_keywords).forEach(key => {
+        // Use the topic key directly (e.g., "Topik 1" -> "Topik 1")
+        // Users can manually rename in the dashboard later
+        labels[key] = key
+      })
+      return labels
+    }
+    // Fallback: build from aspect_distribution keys
+    const aspectDist = state.data?.aspect_distribution
+    if (aspectDist) {
+      const labels = {}
+      Object.keys(aspectDist).forEach(key => {
+        labels[key] = key
+      })
+      return labels
+    }
+    return DEFAULT_ASPECT_LABELS
+  })
+
+  // LDA-specific data
+  const ldaResults = computed(() => state.data?.lda_results || null)
+  const kfoldResults = computed(() => state.data?.kfold_results || null)
+
+  const getAspectLabel = (topicId) => {
+    const labels = ASPECT_LABELS.value
+    return labels[topicId] || topicId
+  }
 
   return {
     state: readonly(state),
@@ -82,6 +116,8 @@ export function useDashboardData() {
     branchAspect,
     sampleReviews,
     getAspectLabel,
-    ASPECT_LABELS
+    ASPECT_LABELS,
+    ldaResults,
+    kfoldResults
   }
 }

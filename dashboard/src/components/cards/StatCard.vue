@@ -19,12 +19,13 @@ const props = defineProps({
   value: { type: [Number, String], required: true },
   subtitle: { type: String, default: '' },
   icon: { type: [Object, Function], default: null },
-  type: { type: String, default: 'default' } // 'default', 'positive', 'negative'
+  type: { type: String, default: 'default' } // 'default', 'positive', 'negative', 'warning'
 })
 
 const valueClass = computed(() => {
   if (props.type === 'positive') return 'text-positive'
   if (props.type === 'negative') return 'text-negative'
+  if (props.type === 'warning') return 'text-warning'
   return 'text-primary'
 })
 
@@ -98,5 +99,14 @@ const displayValue = computed(() => {
 .icon-negative {
   background-color: rgba(239, 68, 68, 0.1);
   color: var(--negative);
+}
+
+.icon-warning {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #D97706;
+}
+
+.text-warning {
+  color: #D97706;
 }
 </style>

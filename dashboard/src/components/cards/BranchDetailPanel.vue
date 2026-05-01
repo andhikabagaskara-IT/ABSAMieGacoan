@@ -10,13 +10,14 @@
         <h3 class="branch-title">{{ displayName }}</h3>
         <div class="sentiment-badges">
           <span class="badge badge-positive">{{ positivePct }}% Positif</span>
+          <span v-if="branchData.netral" class="badge badge-neutral">{{ neutralPct }}% Netral</span>
           <span class="badge badge-negative">{{ negativePct }}% Negatif</span>
         </div>
       </div>
       
       <div class="panel-body">
         <div class="donut-section">
-          <SentimentDonut :positif="branchData.positif" :negatif="branchData.negatif" />
+          <SentimentDonut :positif="branchData.positif || 0" :negatif="branchData.negatif || 0" :netral="branchData.netral || 0" />
         </div>
         
         <div class="aspect-section">
@@ -34,18 +35,39 @@
           </div>
         </div>
         
+        <!-- Sampel Komentar Positif Dominan -->
         <div class="sample-section">
-          <h4>Sampel Ulasan Terbaru</h4>
-          <div v-if="samples.length === 0" class="no-data">Tidak ada sampel ulasan.</div>
+          <h4 class="section-positive">✅ Komentar Positif Dominan</h4>
+          <div v-if="positiveSamples.length === 0" class="no-data">Tidak ada sampel ulasan positif.</div>
           <div class="sample-list">
-            <div v-for="(review, index) in samples" :key="index" class="review-card">
+            <div v-for="(review, index) in positiveSamples" :key="'pos-'+index" class="review-card review-positive">
               <div class="review-header">
                 <span class="reviewer">{{ review.nama_pelanggan }}</span>
                 <div class="review-meta">
                   <span class="rating">⭐ {{ review.rating }}</span>
-                  <span class="badge" :class="review.sentimen === 'positif' ? 'badge-positive' : 'badge-negative'">
-                    {{ review.sentimen }}
-                  </span>
+                  <span class="badge badge-positive">positif</span>
+                </div>
+              </div>
+              <p class="review-text">"{{ review.teks_komentar }}"</p>
+              <div class="review-footer">
+                <span class="aspect-tag">{{ getAspectLabel(review.aspek_lda) }}</span>
+                <span class="date">{{ review.tanggal_ulasan }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sampel Komentar Negatif Dominan -->
+        <div class="sample-section">
+          <h4 class="section-negative">⚠️ Komentar Negatif Dominan</h4>
+          <div v-if="negativeSamples.length === 0" class="no-data">Tidak ada sampel ulasan negatif.</div>
+          <div class="sample-list">
+            <div v-for="(review, index) in negativeSamples" :key="'neg-'+index" class="review-card review-negative">
+              <div class="review-header">
+                <span class="reviewer">{{ review.nama_pelanggan }}</span>
+                <div class="review-meta">
+                  <span class="rating">⭐ {{ review.rating }}</span>
+                  <span class="badge badge-negative">negatif</span>
                 </div>
               </div>
               <p class="review-text">"{{ review.teks_komentar }}"</p>
@@ -68,7 +90,7 @@ import SentimentDonut from '../charts/SentimentDonut.vue'
 
 const props = defineProps({
   branchName: { type: String, default: '' },
-  branchData: { type: Object, default: () => ({ positif: 0, negatif: 0 }) },
+  branchData: { type: Object, default: () => ({ positif: 0, negatif: 0, netral: 0 }) },
   aspectData: { type: Object, default: () => ({}) },
   sampleReviews: { type: Array, default: () => [] },
   getAspectLabel: { type: Function, required: true }
@@ -79,16 +101,21 @@ const displayName = computed(() => {
   return props.branchName.replace('Mie Gacoan - ', '').replace('Mie Gacoan ', '')
 })
 
-const totalSentiment = computed(() => props.branchData.positif + props.branchData.negatif)
+const totalSentiment = computed(() => (props.branchData.positif || 0) + (props.branchData.negatif || 0) + (props.branchData.netral || 0))
 
 const positivePct = computed(() => {
   if (totalSentiment.value === 0) return 0
-  return ((props.branchData.positif / totalSentiment.value) * 100).toFixed(1)
+  return (((props.branchData.positif || 0) / totalSentiment.value) * 100).toFixed(1)
+})
+
+const neutralPct = computed(() => {
+  if (totalSentiment.value === 0) return 0
+  return (((props.branchData.netral || 0) / totalSentiment.value) * 100).toFixed(1)
 })
 
 const negativePct = computed(() => {
   if (totalSentiment.value === 0) return 0
-  return ((props.branchData.negatif / totalSentiment.value) * 100).toFixed(1)
+  return (((props.branchData.negatif || 0) / totalSentiment.value) * 100).toFixed(1)
 })
 
 const totalAspects = computed(() => {
@@ -99,10 +126,21 @@ const sortedAspects = computed(() => {
   return Object.entries(props.aspectData).sort((a, b) => b[1] - a[1])
 })
 
-const samples = computed(() => {
-  return props.sampleReviews
-    .filter(r => r.nama_cabang === props.branchName)
-    .slice(0, 3) // Show max 3 samples
+// Filter branch reviews and split into 2 positif + 2 negatif samples
+const branchReviews = computed(() => {
+  return props.sampleReviews.filter(r => r.nama_cabang === props.branchName)
+})
+
+const positiveSamples = computed(() => {
+  return branchReviews.value
+    .filter(r => r.sentimen === 'positif')
+    .slice(0, 2) // 2 komentar positif dominan
+})
+
+const negativeSamples = computed(() => {
+  return branchReviews.value
+    .filter(r => r.sentimen === 'negatif')
+    .slice(0, 2) // 2 komentar negatif dominan
 })
 
 const formatNumber = (num) => {
@@ -147,6 +185,8 @@ const formatNumber = (num) => {
   align-items: center;
   border-bottom: 1px solid var(--border);
   padding-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .branch-title {
@@ -157,6 +197,12 @@ const formatNumber = (num) => {
 .sentiment-badges {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.badge-neutral {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #D97706;
 }
 
 .panel-body {
@@ -175,6 +221,14 @@ h4 {
   font-size: 1rem;
   margin-bottom: 1rem;
   color: var(--text-primary);
+}
+
+.section-positive {
+  color: var(--positive, #10B981);
+}
+
+.section-negative {
+  color: var(--negative, #EF4444);
 }
 
 .aspect-list {
@@ -222,6 +276,19 @@ h4 {
   padding: 1rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
+  transition: transform 0.15s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-1px);
+}
+
+.review-positive {
+  border-left: 3px solid var(--positive, #10B981);
+}
+
+.review-negative {
+  border-left: 3px solid var(--negative, #EF4444);
 }
 
 .review-header {
@@ -272,5 +339,12 @@ h4 {
 
 .date {
   color: var(--text-secondary);
+}
+
+.no-data {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 0.5rem 0;
 }
 </style>

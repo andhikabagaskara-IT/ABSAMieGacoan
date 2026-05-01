@@ -66,7 +66,7 @@
     <div class="sidebar-footer">
       <div class="stat-item">
         <TrendingUp class="icon-small" />
-        <span>51.885 Ulasan</span>
+        <span>57.560 Ulasan</span>
       </div>
       <div class="stat-item">
         <Clock class="icon-small" />

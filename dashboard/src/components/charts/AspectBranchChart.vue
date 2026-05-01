@@ -28,14 +28,16 @@ const chartData = computed(() => {
   const branches = Object.keys(props.branchAspectData)
   const labels = branches.map(b => b.replace('Mie Gacoan - ', '').replace('Mie Gacoan ', ''))
   
-  const topics = Object.keys(ASPECT_LABELS)
-  const colors = ['#03A9F4', '#4FC3F7', '#10B981', '#F48FB1', '#EC407A']
+  // Dynamic topics from ASPECT_LABELS (now a computed ref)
+  const aspectLabels = ASPECT_LABELS.value || {}
+  const topics = Object.keys(aspectLabels)
+  const colors = ['#03A9F4', '#10B981', '#F59E0B', '#EC407A', '#8B5CF6', '#06B6D4', '#F97316', '#6366F1', '#14B8A6', '#E11D48']
   
   const datasets = topics.map((topic, index) => {
     return {
       label: getAspectLabel(topic),
       backgroundColor: colors[index % colors.length],
-      data: branches.map(b => props.branchAspectData[b][topic] || 0),
+      data: branches.map(b => props.branchAspectData[b]?.[topic] || 0),
       borderRadius: 2
     }
   })

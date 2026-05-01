@@ -118,8 +118,8 @@ def main():
     X = df['text_preprocessed'].astype(str).values
     y = df['sentimen'].values
 
-    # Encode label: positif = 1, negatif = 0 (untuk SMOTE compatibility)
-    label_map = {'positif': 1, 'negatif': 0}
+    # Encode label: positif = 2, netral = 1, negatif = 0 (untuk SMOTE compatibility)
+    label_map = {'positif': 2, 'netral': 1, 'negatif': 0}
     label_map_inv = {v: k for k, v in label_map.items()}
     y_encoded = np.array([label_map.get(lbl, -1) for lbl in y])
 
@@ -129,8 +129,8 @@ def main():
     y_encoded = y_encoded[valid_mask]
 
     log.info(f"Total data siap untuk Stratified K-Fold: {len(X)}")
-    log.info(f"Distribusi label: Positif={np.sum(y_encoded == 1)}, Negatif={np.sum(y_encoded == 0)}")
-    log.info(f"Rasio Positif:Negatif = {np.sum(y_encoded == 1)/len(y_encoded)*100:.1f}% : {np.sum(y_encoded == 0)/len(y_encoded)*100:.1f}%")
+    log.info(f"Distribusi label: Positif={np.sum(y_encoded == 2)}, Netral={np.sum(y_encoded == 1)}, Negatif={np.sum(y_encoded == 0)}")
+    log.info(f"Rasio Pos:Net:Neg = {np.sum(y_encoded == 2)/len(y_encoded)*100:.1f}% : {np.sum(y_encoded == 1)/len(y_encoded)*100:.1f}% : {np.sum(y_encoded == 0)/len(y_encoded)*100:.1f}%")
 
     # ─── 2. Inisialisasi Stratified K-Fold ──────────────────────────────────
     skf = StratifiedKFold(n_splits=K_FOLDS, shuffle=True, random_state=RANDOM_STATE)
@@ -164,8 +164,8 @@ def main():
         y_train, y_test = y_encoded[train_index], y_encoded[test_index]
 
         log.info(f"  Data Train: {len(X_train_text)} | Data Test: {len(X_test_text)}")
-        log.info(f"  Train - Positif: {np.sum(y_train == 1)}, Negatif: {np.sum(y_train == 0)}")
-        log.info(f"  Test  - Positif: {np.sum(y_test == 1)}, Negatif: {np.sum(y_test == 0)}")
+        log.info(f"  Train - Positif: {np.sum(y_train == 2)}, Netral: {np.sum(y_train == 1)}, Negatif: {np.sum(y_train == 0)}")
+        log.info(f"  Test  - Positif: {np.sum(y_test == 2)}, Netral: {np.sum(y_test == 1)}, Negatif: {np.sum(y_test == 0)}")
 
         # ─── 3a. TF-IDF Vectorization (di dalam fold untuk mencegah data leakage) ──
         log.info("  [a] TF-IDF Vectorization (fit pada train, transform pada test)...")
@@ -177,8 +177,8 @@ def main():
         log.info("  [b] SMOTE Oversampling pada data Training...")
         smote = SMOTE(random_state=RANDOM_STATE)
         X_train_smote, y_train_smote = smote.fit_resample(X_train_tfidf, y_train)
-        log.info(f"      Sebelum SMOTE: Positif={np.sum(y_train == 1)}, Negatif={np.sum(y_train == 0)}")
-        log.info(f"      Sesudah SMOTE: Positif={np.sum(y_train_smote == 1)}, Negatif={np.sum(y_train_smote == 0)}")
+        log.info(f"      Sebelum SMOTE: Positif={np.sum(y_train == 2)}, Netral={np.sum(y_train == 1)}, Negatif={np.sum(y_train == 0)}")
+        log.info(f"      Sesudah SMOTE: Positif={np.sum(y_train_smote == 2)}, Netral={np.sum(y_train_smote == 1)}, Negatif={np.sum(y_train_smote == 0)}")
 
         # ─── 3c. Training Model SVM ────────────────────────────────────────
         log.info("  [c] Training SVM (kernel=linear)...")
@@ -294,8 +294,8 @@ def main():
     all_y_pred_svm = np.array(all_y_pred_svm)
     all_y_pred_nb = np.array(all_y_pred_nb)
 
-    class_labels_encoded = [0, 1]
-    class_labels_display = ['negatif', 'positif']
+    class_labels_encoded = [0, 1, 2]
+    class_labels_display = ['negatif', 'netral', 'positif']
 
     cm_svm = confusion_matrix(all_y_true, all_y_pred_svm, labels=class_labels_encoded)
     cm_nb = confusion_matrix(all_y_true, all_y_pred_nb, labels=class_labels_encoded)

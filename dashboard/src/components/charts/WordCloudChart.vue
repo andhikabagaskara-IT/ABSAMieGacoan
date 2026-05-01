@@ -19,16 +19,18 @@
       />
       <div v-else class="cloud-fallback">
         <p>Silakan letakkan gambar <strong>wordcloud_{{ selectedTopic.toLowerCase().replace(' ', '_') }}.png</strong> di folder public.</p>
-        <div class="fallback-keywords">
+        <div class="fallback-keywords" v-if="currentWords.length > 0">
           <span v-for="word in currentWords" :key="word" class="fallback-word">{{ word }}</span>
         </div>
+        <p v-else class="no-keywords">Jalankan ulang script 06_lda_aspect.py untuk memperbarui data.</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useDashboardData } from '../../composables/useDashboardData'
 
 const props = defineProps({
   aspectMap: {
@@ -37,19 +39,24 @@ const props = defineProps({
   }
 })
 
-const selectedTopic = ref('Topik 1')
+const { ldaResults } = useDashboardData()
+
+// Auto-select first topic from aspect map
+const selectedTopic = ref('')
+watch(() => props.aspectMap, (newMap) => {
+  if (newMap && Object.keys(newMap).length > 0 && !selectedTopic.value) {
+    selectedTopic.value = Object.keys(newMap)[0]
+  }
+}, { immediate: true })
+
 const imageErrorMap = ref({})
 
-// Hardcoded dari LDA topics report
-const keywordData = {
-  'Topik 1': ['enak', 'pedas', 'bumbu', 'mienya', 'nyaman', 'level', 'meresap', 'khas', 'gurih', 'mantap'],
-  'Topik 2': ['tempat', 'bersih', 'nyaman', 'makan', 'luas', 'nagih', 'parkir', 'cozy', 'keluarga', 'suasana'],
-  'Topik 3': ['layan', 'ramah', 'cepat', 'pesan', 'goreng', 'kecewa', 'antri', 'kasir', 'staf', 'sopan'],
-  'Topik 4': ['mie', 'porsi', 'harga', 'cocok', 'nongkrong', 'surabaya', 'terjangkau', 'murah', 'pas', 'banyak']
-}
-
+// Dynamic keyword data from LDA results JSON (not hardcoded)
 const currentWords = computed(() => {
-  return keywordData[selectedTopic.value] || []
+  if (ldaResults.value && ldaResults.value.topics_keywords) {
+    return ldaResults.value.topics_keywords[selectedTopic.value] || []
+  }
+  return []
 })
 
 const handleImageError = () => {
@@ -112,6 +119,11 @@ const handleImageError = () => {
 .cloud-fallback p {
   font-size: 0.875rem;
   margin-bottom: 1rem;
+}
+
+.no-keywords {
+  font-style: italic;
+  opacity: 0.7;
 }
 
 .fallback-keywords {

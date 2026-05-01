@@ -9,8 +9,9 @@ Proyek machine learning ini dikembangkan secara *end-to-end* untuk menyelesaikan
 2. **Pelabelan Sentimen**: Mengkategorikan ulasan secara otomatis menjadi **Positif**, **Negatif**, atau **Netral** berdasarkan kombinasi kata kunci dari teks komentar dan rating bintang yang diberikan oleh pelanggan.
 3. **Preprocessing Data (NLP)**: Memproses data teks ulasan yang berantakan menggunakan pipeline *Natural Language Processing* Bahasa Indonesia (Cleaning, Case Folding, Normalisasi Slang, Tokenizing, Stopword Removal, Stemming Sastrawi).
 4. **Klasifikasi Sentimen**: Melatih algoritma machine learning **Support Vector Machine (SVM)** dan membandingkannya dengan **Naive Bayes**.
-5. **Ekstraksi Aspek (Topic Modeling)**: Mengidentifikasi 4 topik/aspek utama ulasan (seperti Rasa, Harga, Pelayanan, Tempat) menggunakan **Latent Dirichlet Allocation (LDA)**, yang dievaluasi kualitas clusteringnya menggunakan metrik *Davies-Bouldin Index (DBI)*. Ekstraksi ini juga secara otomatis menghasilkan gambar Word Cloud.
-6. **Dashboard Interaktif**: Menyajikan insight sentimen dan metrik model dalam bentuk visualisasi web yang interaktif menggunakan **VueJS**, lengkap dengan animasi transisi Dark Mode dan penjelasan algoritma yang ramah pengguna.
+5. **Ekstraksi Aspek (Topic Modeling)**: Mengidentifikasi topik/aspek utama ulasan secara dinamis dengan mencari *K optimal (Range K=3-10)* menggunakan **Latent Dirichlet Allocation (LDA)**, yang dievaluasi kualitas clusteringnya menggunakan metrik *Davies-Bouldin Index (DBI)*. Ekstraksi ini juga secara otomatis menghasilkan gambar Word Cloud.
+6. **Backend API**: Menggunakan **Flask** untuk membuat layanan REST API yang menyediakan data hasil ekspor.
+7. **Dashboard Interaktif**: Menyajikan insight sentimen (3 Kelas: Positif, Negatif, Netral) dan metrik model dalam bentuk visualisasi web yang interaktif menggunakan **VueJS**, memuat 50.000+ data *explorer* lengkap dengan animasi transisi Dark Mode dan penjelasan algoritma yang ramah pengguna.
 
 ## 📂 Struktur Folder Repositori
 
@@ -29,7 +30,8 @@ Proyek machine learning ini dikembangkan secara *end-to-end* untuk menyelesaikan
   - `07_export_dashboard.py` : Skrip export JSON untuk dashboard.
 - **`models/`**: Folder ini akan berisi model yang sudah di-training (`.pkl` atau `.joblib`) agar tidak perlu training ulang saat dipanggil aplikasi.
 - **`results/`**: Menyimpan dokumen laporan metrik evaluasi seperti Confusion Matrix, *classification reports*, hingga DBI Score dari pemodelan LDA.
-- **`dashboard/`**: Folder *frontend* berisi proyek VueJS yang berfungsi sebagai *user interface* untuk melihat statistik sentimen dan prediksi *real-time*.
+- **`backend/`**: Folder API server berbasis Flask yang menyediakan *endpoint* RESTful.
+- **`dashboard/`**: Folder *frontend* berisi proyek VueJS yang berfungsi sebagai *user interface* untuk melihat statistik sentimen dan *data explorer*.
 
 ## 🚀 Cara Menjalankan
 
@@ -62,6 +64,10 @@ Bagi yang ingin mencoba menjalankan *pipeline* dari awal secara lokal, silakan i
    
    # 7. Ekspor hasil ke Dashboard (JSON)
    python scripts/07_export_dashboard.py
+   
+   # 8. (Opsional) Jalankan Backend API
+   cd backend
+   python app.py
    ```
 
 > **Catatan**: Tahapan lanjutan akan diupdate seiring berjalannya proyek. Harap berhati-hati saat menjalankan skrip yang memakan waktu lama (seperti scraping dan stemming) — Anda mungkin bisa mengedit kodenya sedikit untuk memproses sampel data (misalnya `df.head(100)`) bila hanya ingin menguji *pipeline*.

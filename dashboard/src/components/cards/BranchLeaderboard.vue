@@ -76,15 +76,16 @@ defineEmits(['select-branch'])
 const processedBranches = computed(() => {
   return Object.keys(props.branchData).map(name => {
     const data = props.branchData[name]
-    const total = data.positif + data.negatif
-    const positivePct = total > 0 ? ((data.positif / total) * 100).toFixed(1) : 0
-    const negativePct = total > 0 ? ((data.negatif / total) * 100).toFixed(1) : 0
+    const total = (data.positif || 0) + (data.negatif || 0) + (data.netral || 0)
+    const positivePct = total > 0 ? (((data.positif || 0) / total) * 100).toFixed(1) : 0
+    const negativePct = total > 0 ? (((data.negatif || 0) / total) * 100).toFixed(1) : 0
     
     return {
       name,
       displayName: name.replace('Mie Gacoan - ', '').replace('Mie Gacoan ', ''),
-      positif: data.positif,
-      negatif: data.negatif,
+      positif: data.positif || 0,
+      negatif: data.negatif || 0,
+      netral: data.netral || 0,
       total,
       positivePct: parseFloat(positivePct),
       negativePct: parseFloat(negativePct)

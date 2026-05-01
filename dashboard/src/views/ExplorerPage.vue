@@ -2,7 +2,7 @@
   <div class="explorer-page">
     <div class="section-title">
       <h2>📋 Data Explorer</h2>
-      <p>Telusuri {{ totalFiltered.toLocaleString() }} ulasan dari {{ totalAll.toLocaleString() }} sampel yang tersedia.</p>
+      <p>Telusuri {{ totalFiltered.toLocaleString() }} ulasan dari {{ totalAll.toLocaleString() }} data yang tersedia.</p>
     </div>
 
     <!-- Search & Filter Bar -->
@@ -34,8 +34,9 @@
           <label>Sentimen</label>
           <select v-model="filterSentiment" class="input-field select-field" @change="onFilterChange">
             <option value="">Semua</option>
-            <option value="positif">😊 Positif</option>
-            <option value="negatif">😠 Negatif</option>
+            <option value="positif">Positif</option>
+            <option value="negatif">Negatif</option>
+            <option value="netral">Netral</option>
           </select>
         </div>
         <div class="filter-group">
@@ -51,6 +52,7 @@
             <option value="">Semua</option>
             <option value="5">⭐⭐⭐⭐⭐</option>
             <option value="4">⭐⭐⭐⭐</option>
+            <option value="3">⭐⭐⭐</option>
             <option value="2">⭐⭐</option>
             <option value="1">⭐</option>
           </select>
@@ -117,13 +119,13 @@
                 <span v-else class="review-text full">{{ review.teks_komentar }}</span>
               </td>
               <td class="col-sentiment">
-                <span class="sentiment-badge" :class="review.sentimen">
-                  {{ review.sentimen === 'positif' ? '😊' : '😠' }}
+                <span class="sentiment-label" :class="'sentiment-' + review.sentimen">
+                  {{ capitalize(review.sentimen) }}
                 </span>
               </td>
               <td class="col-aspect">
-                <span class="aspect-tag" :title="getAspectLabel(review.aspek_lda)">
-                  {{ getAspectIcon(review.aspek_lda) }}
+                <span class="aspect-tag-small" :title="getAspectLabel(review.aspek_lda)">
+                  {{ getAspectLabel(review.aspek_lda) }}
                 </span>
               </td>
             </tr>
@@ -178,7 +180,7 @@ const filterRating = ref('')
 const sortKey = ref('')
 const sortDir = ref('asc')
 const currentPage = ref(1)
-const perPage = 20
+const perPage = 25
 const expandedRow = ref(null)
 
 const branches = computed(() => branchList.value)
@@ -245,11 +247,7 @@ const toggleSort = (key) => {
 const toggleExpand = (index) => { expandedRow.value = expandedRow.value === index ? null : index }
 const truncate = (text, len) => text && text.length > len ? text.substring(0, len) + '...' : text
 const shortBranch = (name) => name?.replace('Mie Gacoan - ', '').replace('Mie Gacoan ', '')
-
-const getAspectIcon = (aspect) => {
-  const icons = { 'Topik 1': '🍜', 'Topik 2': '🏠', 'Topik 3': '🤝', 'Topik 4': '💰' }
-  return icons[aspect] || '📌'
-}
+const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : ''
 
 const exportCsv = () => {
   const headers = ['Cabang', 'Pelanggan', 'Tanggal', 'Rating', 'Ulasan', 'Sentimen', 'Aspek']
@@ -318,8 +316,8 @@ const exportCsv = () => {
 .col-customer { min-width: 100px; max-width: 130px; }
 .col-rating { width: 40px; text-align: center !important; }
 .col-review { min-width: 200px; }
-.col-sentiment { width: 60px; text-align: center !important; }
-.col-aspect { width: 45px; text-align: center !important; }
+.col-sentiment { width: 80px; text-align: center !important; }
+.col-aspect { width: 80px; text-align: center !important; }
 
 /* Badges */
 .branch-tag { font-size: 0.75rem; font-weight: 500; color: var(--primary-dark); background: rgba(3, 169, 244, 0.08); padding: 0.15rem 0.5rem; border-radius: 4px; white-space: nowrap; }
@@ -327,11 +325,40 @@ const exportCsv = () => {
 .rating-badge { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; font-size: 0.7rem; font-weight: 700; }
 .rating-5 { background: rgba(16, 185, 129, 0.15); color: var(--positive); }
 .rating-4 { background: rgba(3, 169, 244, 0.15); color: var(--primary); }
+.rating-3 { background: rgba(245, 158, 11, 0.15); color: #D97706; }
 .rating-2 { background: rgba(245, 158, 11, 0.15); color: #D97706; }
 .rating-1 { background: rgba(239, 68, 68, 0.15); color: var(--negative); }
 
-.sentiment-badge { font-size: 1.1rem; }
-.aspect-tag { font-size: 1rem; cursor: help; }
+/* Sentiment Label — text only, no emoticons */
+.sentiment-label {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  text-transform: capitalize;
+}
+.sentiment-positif {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--positive, #10B981);
+}
+.sentiment-negatif {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--negative, #EF4444);
+}
+.sentiment-netral {
+  background: rgba(245, 158, 11, 0.12);
+  color: #D97706;
+}
+
+.aspect-tag-small {
+  font-size: 0.7rem;
+  background-color: rgba(3, 169, 244, 0.08);
+  color: var(--primary-dark);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
 
 .review-text { line-height: 1.5; }
 .review-text.truncated { color: var(--text-secondary); }

@@ -1,61 +1,76 @@
 {
-    "best_k": 4,
-    "best_dbi": 0.33612879569811416,
+    "best_k": 5,
+    "best_dbi": 0.2823015882784394,
     "dbi_scores": {
-        "3": 0.3591028464887798,
-        "4": 0.33612879569811416,
-        "5": 0.2734524930283272,
-        "6": 0.28565393511881204,
-        "7": 0.25670545664128414
+        "3": 0.33141730810631415,
+        "4": 0.3795878656719276,
+        "5": 0.2823015882784394,
+        "6": 0.3365109117382843,
+        "7": 0.32479725375463675,
+        "8": 0.28655979843920726,
+        "9": 0.3385214785395914,
+        "10": 0.30304276100508293
     },
     "topics_keywords": {
         "Topik 1": [
-            "makan",
+            "keluarga",
+            "anak",
+            "bagus",
+            "nyaman",
+            "suka",
             "mie",
-            "banget",
-            "layan",
-            "puas",
-            "enak",
-            "favorit",
-            "bosen",
-            "bumbu",
-            "bintang"
+            "tempat",
+            "lumayan",
+            "goreng",
+            "nagih"
         ],
         "Topik 2": [
+            "makan",
             "enak",
-            "banget",
-            "layan",
             "mie",
-            "bersih",
+            "layan",
+            "nyaman",
+            "banget",
             "tempat",
-            "goreng",
-            "cepat",
-            "ramah",
-            "kadang"
+            "mienya",
+            "parkir",
+            "cepat"
         ],
         "Topik 3": [
-            "level",
-            "pedas",
-            "porsi",
-            "harga",
-            "mie",
-            "enak",
-            "lumayan",
-            "mienya",
-            "bumbu",
-            "kecewa"
+            "layan",
+            "banget",
+            "cepat",
+            "makan",
+            "oke",
+            "ramah",
+            "kali",
+            "es",
+            "kunjung",
+            "teh"
         ],
         "Topik 4": [
-            "makan",
-            "nyaman",
-            "cepat",
-            "tempat",
             "banget",
-            "layan",
+            "pedas",
+            "level",
             "enak",
-            "pilih",
+            "bumbu",
+            "harga",
+            "makan",
             "mie",
-            "suka"
+            "mienya",
+            "pas"
+        ],
+        "Topik 5": [
+            "enak",
+            "makan",
+            "kadang",
+            "konsisten",
+            "banget",
+            "favorit",
+            "pesan",
+            "kecewa",
+            "bosen",
+            "rame"
         ]
     }
 }

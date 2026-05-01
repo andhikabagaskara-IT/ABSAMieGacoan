@@ -22,7 +22,9 @@ graph TD
     D --> E["05_classification.py — Stratified K-Fold CV + SMOTE"]
     E --> F["06_lda_aspect.py — Ekstraksi Aspek LDA"]
     F --> G["07_export_dashboard.py — Export JSON untuk Dashboard"]
-    G --> H["Dashboard VueJS — Visualisasi Interaktif"]
+    G --> H["Backend Flask API — Melayani Data via REST"]
+    H --> I["Dashboard VueJS — Visualisasi Interaktif"]
+    G -.-> I
     
     subgraph "Di dalam 05_classification.py"
         E1["Inisialisasi Stratified K-Fold K=5"] --> E2["Loop Fold 1..K"]
@@ -88,6 +90,10 @@ scrapinggacoan2026/
 │   ├── 05_classification.py          # Tahap 5: Stratified K-Fold CV + SMOTE + SVM & NB
 │   ├── 06_lda_aspect.py              # Tahap 6: Ekstraksi aspek dengan LDA
 │   └── 07_export_dashboard.py        # Tahap 7: Export data JSON untuk dashboard
+├── backend/                          # Flask REST API Backend
+│   ├── app.py                        # Main Flask application
+│   ├── config.py                     # Konfigurasi path & CORS
+│   └── requirements.txt              # Dependencies Flask
 ├── dashboard/                        # VueJS Dashboard
 │   ├── src/
 │   │   ├── components/
@@ -218,8 +224,8 @@ Output:
 #### [UPDATED] scripts/06_lda_aspect.py
 
 - CountVectorizer + LDA topic modeling
-- Eksperimen jumlah topik optimal dan evaluasi menggunakan **Davies-Bouldin Index (DBI)**
-- **Memaksa (Force) ekstraksi ke 4 aspek utama** sesuai kebutuhan bisnis
+- Pencarian jumlah topik optimal secara dinamis (Range K=3 hingga 10) menggunakan **Davies-Bouldin Index (DBI)**
+- Tidak lagi ada paksaan jumlah topik (sebelumnya dipaksa 4), hasil murni dari skor DBI terendah
 - Generate **Word Cloud** otomatis dan menyimpannya ke `dashboard/public` untuk ditampilkan di UI
 - Identifikasi aspek dominan dan keyword per topik
 - **Analisis aspek per sentimen** — membedah topik/aspek apa yang sering muncul pada sentimen positif atau negatif
@@ -248,7 +254,7 @@ Output:
   - **Cross-tabulation Aspek x Sentimen**
   - **Hasil K-Fold CV** (dimuat dari `kfold_results.json`)
   - **Hasil LDA** (dimuat dari `lda_results.json`)
-  - Sampel ulasan untuk Data Explorer (1500 record)
+  - Seluruh record ulasan untuk Data Explorer (Full dataset tanpa sampling)
 
 Output: `data/export/dashboard_data.json`
 
@@ -270,7 +276,7 @@ Fitur-fitur dashboard untuk manajemen restoran:
    - Pilih cabang tertentu
    - Distribusi sentimen cabang tersebut
    - Aspek dominan per cabang
-   - Ulasan terbaru dengan sentimen & aspek
+   - 4 Sampel ulasan per cabang (2 Positif Dominan + 2 Negatif Dominan)
 
 3. **Perbandingan Algoritma (K-Fold CV)**
    - Tabel perbandingan SVM vs Naive Bayes
@@ -280,7 +286,7 @@ Fitur-fitur dashboard untuk manajemen restoran:
    - Grafik perbandingan metrik per fold
 
 4. **Analisis Aspek (LDA)**
-   - Daftar 4 aspek utama yang ditemukan
+   - Daftar aspek optimal hasil pencarian otomatis DBI
    - Word cloud dinamis per aspek (hasil generate script Python)
    - Distribusi sentimen per aspek
    - Evaluasi DBI score beserta panduan cara membacanya
@@ -297,6 +303,15 @@ Fitur-fitur dashboard untuk manajemen restoran:
    - Filter berdasarkan cabang, sentimen, aspek
    - Search functionality
    - Export data
+
+---
+
+### Tahap 9: Backend Flask API (Layer Service)
+
+#### `backend/app.py`
+- Menyediakan REST API endpoints (`/api/dashboard`, `/api/reviews`, `/api/lda`, dll)
+- Mengkonsumsi data JSON dan memfasilitasi integrasi dengan platform luar
+- Membuka jalan integrasi *real-time* dan *server-side pagination* di iterasi mendatang
 
 ---
 
@@ -330,20 +345,25 @@ Fitur-fitur dashboard untuk manajemen restoran:
 | 4   | Pelabelan sentimen                            | `03_labeling.py`          | ✅ Selesai       |
 | 5   | Preprocessing data NLP                        | `04_preprocessing.py`     | ✅ Selesai       |
 | 6   | Klasifikasi: Stratified K-Fold CV + SMOTE     | `05_classification.py`    | 🔄 Berjalan     |
-| 7   | Ekstraksi aspek LDA                           | `06_lda_aspect.py`        | 🔄 Berjalan     |
-| 8   | Export data untuk dashboard                   | `07_export_dashboard.py`  | 🔄 Berjalan     |
+| 7   | Ekstraksi aspek LDA                           | `06_lda_aspect.py`        | ✅ Selesai       |
+| 8   | Export data untuk dashboard                   | `07_export_dashboard.py`  | ✅ Selesai       |
 | 9   | Dashboard VueJS (Frontend)                    | `dashboard/`              | ✅ Selesai      |
+| 10  | Backend API (REST Server)                     | `backend/`                | ✅ Selesai      |
 
-> **Tahap 1-5 dan Frontend telah diselesaikan.** Tahap klasifikasi hingga export JSON saat ini berjalan dengan penerapan 3 kelas (Positif, Negatif, Netral).
+> **Seluruh tahapan dari 1-10 telah diselesaikan.** Pipeline ML kini mencakup penentuan otomatis topik LDA, dashboard sentimen lengkap (3 Kelas), data explorer 50.000+ data, serta penyediaan Flask API backend.
 
-> **Cara menjalankan ulang pipeline (dari quality check sampai export):**
+> **Cara menjalankan ulang pipeline lengkap:**
 > ```bash
 > cd scrapinggacoan2026
 > python scripts/02_quality_check.py
 > python scripts/03_labeling.py
 > python scripts/04_preprocessing.py
-> pip install imbalanced-learn
 > python scripts/05_classification.py
 > python scripts/06_lda_aspect.py
 > python scripts/07_export_dashboard.py
+> 
+> # (Opsional) Jalankan Backend API
+> cd backend
+> pip install -r requirements.txt
+> python app.py
 > ```
