@@ -31,7 +31,36 @@
         <DbiEvaluationCard />
       </div>
     </div>
-    <!-- Row 3: Summary Explanation -->
+    <!-- Row 3: Topic Reference -->
+    <div class="reference-row">
+      <div class="summary-card card">
+        <h3 class="card-title">Kamus Referensi Topik (LDA)</h3>
+        <div class="reference-content">
+          <div class="topic-ref-item">
+            <span class="topic-ref-badge">Topik 1</span>
+            <span class="topic-ref-desc"><strong>Suasana & Kenyamanan Keluarga</strong> — Berkaitan dengan ambience, kebersihan area makan, dan kenyamanan membawa anak/keluarga.</span>
+          </div>
+          <div class="topic-ref-item">
+            <span class="topic-ref-badge">Topik 2</span>
+            <span class="topic-ref-desc"><strong>Kualitas Layanan & Fasilitas</strong> — Berkaitan dengan kecepatan penyajian, sistem antrean, dan fasilitas seperti parkir/toilet.</span>
+          </div>
+          <div class="topic-ref-item">
+            <span class="topic-ref-badge">Topik 3</span>
+            <span class="topic-ref-desc"><strong>Pelayanan Staff & Keramahan</strong> — Terfokus pada sikap pelayan, keramahan kasir, dan kesigapan karyawan.</span>
+          </div>
+          <div class="topic-ref-item">
+            <span class="topic-ref-badge">Topik 4</span>
+            <span class="topic-ref-desc"><strong>Rasa dan Harga</strong> — Berfokus pada kualitas makanan (mie, dimsum), tingkat kepedasan, porsi, serta *value for money*.</span>
+          </div>
+          <div class="topic-ref-item">
+            <span class="topic-ref-badge">Topik 5</span>
+            <span class="topic-ref-desc"><strong>Konsistensi & Kepuasan Pelanggan</strong> — Kesan keseluruhan (overall experience), niat untuk kembali, dan standar konsistensi rasa antar cabang.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 4: Summary Explanation -->
     <div class="summary-row">
       <div class="summary-card card">
         <h3 class="card-title">Pemahaman Konsep: Apa itu LDA & DBI?</h3>
@@ -167,7 +196,7 @@ const filteredBranchAspectData = computed(() => {
   }
 }
 
-.summary-row {
+.summary-row, .reference-row {
   margin-top: 1rem;
 }
 
@@ -181,6 +210,42 @@ const filteredBranchAspectData = computed(() => {
   color: var(--primary);
   border-bottom: 2px solid var(--bg-subtle);
   padding-bottom: 0.5rem;
+}
+
+.reference-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.topic-ref-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.75rem;
+  background-color: var(--bg-subtle);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--primary);
+}
+
+.topic-ref-badge {
+  background-color: rgba(3, 169, 244, 0.15);
+  color: var(--primary-dark);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.topic-ref-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.topic-ref-desc strong {
+  color: var(--text-primary);
 }
 
 .summary-content {

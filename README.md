@@ -10,8 +10,9 @@ Proyek machine learning ini dikembangkan secara *end-to-end* untuk menyelesaikan
 3. **Preprocessing Data (NLP)**: Memproses data teks ulasan yang berantakan menggunakan pipeline *Natural Language Processing* Bahasa Indonesia (Cleaning, Case Folding, Normalisasi Slang, Tokenizing, Stopword Removal, Stemming Sastrawi).
 4. **Klasifikasi Sentimen**: Melatih algoritma machine learning **Support Vector Machine (SVM)** dan membandingkannya dengan **Naive Bayes**.
 5. **Ekstraksi Aspek (Topic Modeling)**: Mengidentifikasi topik/aspek utama ulasan secara dinamis dengan mencari *K optimal (Range K=3-10)* menggunakan **Latent Dirichlet Allocation (LDA)**, yang dievaluasi kualitas clusteringnya menggunakan metrik *Davies-Bouldin Index (DBI)*. Ekstraksi ini juga secara otomatis menghasilkan gambar Word Cloud.
-6. **Backend API**: Menggunakan **Flask** untuk membuat layanan REST API yang menyediakan data hasil ekspor.
-7. **Dashboard Interaktif**: Menyajikan insight sentimen (3 Kelas: Positif, Negatif, Netral) dan metrik model dalam bentuk visualisasi web yang interaktif menggunakan **VueJS**, memuat 50.000+ data *explorer* lengkap dengan animasi transisi Dark Mode dan penjelasan algoritma yang ramah pengguna.
+6. **Backend API**: Menggunakan **Flask** sebagai kerangka layanan REST API yang menyediakan data terpusat.
+7. **Dashboard Interaktif**: Menyajikan insight sentimen (3 Kelas: Positif, Negatif, Netral) dan metrik model dalam bentuk visualisasi web yang interaktif menggunakan **VueJS**, memuat 50.000+ data *explorer* lengkap dengan animasi transisi Dark Mode dan penjelasan algoritma yang ramah pengguna. Termasuk fitur *Sync Center* dengan parameter scraper yang dapat disesuaikan.
+8. **Pengembangan Lanjutan**: Mengubah proyek menjadi arsitektur *Fullstack* dengan integrasi *database* (PostgreSQL/MySQL), real-time API *prediction*, dan *live pipeline execution*.
 
 ## 📂 Struktur Folder Repositori
 

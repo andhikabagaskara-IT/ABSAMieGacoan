@@ -23,7 +23,12 @@
     </div>
     
     <div class="form-group mt-3">
-      <label>Target Cabang:</label>
+      <div class="branch-header">
+        <label>Target Cabang:</label>
+        <button class="btn-text text-primary" @click="toggleAllBranches">
+          {{ selectedBranches.length === branchList.length ? 'Batal Pilih Semua' : 'Pilih Semua' }}
+        </button>
+      </div>
       <div class="branch-checkboxes">
         <label class="checkbox-label" v-for="branch in branchList" :key="branch">
           <input type="checkbox" :value="branch" v-model="selectedBranches" />
@@ -45,9 +50,13 @@ const year = ref('2026')
 const limit = ref(2000)
 const selectedBranches = ref([])
 
-// Initialize with all branches
-if (branchList.value.length > 0) {
-  selectedBranches.value = [...branchList.value]
+// Toggle all branches
+const toggleAllBranches = () => {
+  if (selectedBranches.value.length === branchList.value.length) {
+    selectedBranches.value = []
+  } else {
+    selectedBranches.value = [...branchList.value]
+  }
 }
 </script>
 
@@ -103,6 +112,25 @@ if (branchList.value.length > 0) {
 .range-slider {
   width: 100%;
   accent-color: var(--primary);
+}
+
+.branch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-text:hover {
+  text-decoration: underline;
 }
 
 .branch-checkboxes {

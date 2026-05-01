@@ -287,6 +287,7 @@ Fitur-fitur dashboard untuk manajemen restoran:
 
 4. **Analisis Aspek (LDA)**
    - Daftar aspek optimal hasil pencarian otomatis DBI
+   - **Kamus Referensi Topik** untuk memudahkan interpretasi aspek
    - Word cloud dinamis per aspek (hasil generate script Python)
    - Distribusi sentimen per aspek
    - Evaluasi DBI score beserta panduan cara membacanya
@@ -299,19 +300,46 @@ Fitur-fitur dashboard untuk manajemen restoran:
    - Tampilkan hasil kedua algoritma sebagai pembanding
 
 6. **Data Explorer**
-   - Tabel interaktif semua ulasan
-   - Filter berdasarkan cabang, sentimen, aspek
+   - Tabel interaktif memuat 50.000+ ulasan tanpa lagging
+   - Filter berdasarkan cabang, sentimen (3 kelas text), aspek
    - Search functionality
-   - Export data
+   - Export data ke CSV
+
+7. **Sync Center (Update Data)**
+   - Fitur upload dataset eksternal (CSV)
+   - Pop-out modal parameter scraper (Filter Tahun, Limit, & Checkbox Cabang)
+   - *Pipeline monitor* untuk tracking progress.
 
 ---
 
-### Tahap 9: Backend Flask API (Layer Service)
+### Tahap 9: Pengembangan Backend Fullstack (Rencana Kerja Terperinci)
 
-#### `backend/app.py`
-- Menyediakan REST API endpoints (`/api/dashboard`, `/api/reviews`, `/api/lda`, dll)
-- Mengkonsumsi data JSON dan memfasilitasi integrasi dengan platform luar
-- Membuka jalan integrasi *real-time* dan *server-side pagination* di iterasi mendatang
+Backend Flask saat ini sudah disiapkan sebagai kerangka (skeleton) awal API. Ke depannya, backend ini idealnya dimanfaatkan dan dikembangkan menjadi pusat arsitektur (*Fullstack Integration*) dengan rencana kerja berikut:
+
+#### 1. Real-time Pipeline Execution (Pusat Kendali Sync Center)
+Saat ini simulasi Sync Center di frontend hanya sebuah animasi UI. Idealnya:
+- Backend bertugas mengeksekusi script Python secara langsung (dari `01_scraping.py` hingga `07_export_dashboard.py`) menggunakan mekanisme *subprocess* atau *task queue* (misal: Celery).
+- Menyediakan endpoint **WebSocket** atau **Server-Sent Events (SSE)** agar frontend dapat menampilkan *progress bar* yang aktual per tahapan.
+- Menerima parameter *scraper* dari UI (tahun, limit, daftar target cabang) via POST `/api/sync/start` lalu menyuntikkannya sebagai *arguments* ke eksekusi script.
+
+#### 2. Server-side Data Management (Database Integration)
+Saat ini proyek bergantung pada parsing file JSON berukuran puluhan MB ke dalam *memory browser*. Idealnya:
+- Memigrasi penyimpanan data dari file CSV/JSON statis ke sistem *Relational Database* seperti PostgreSQL atau MySQL.
+- Menangani *server-side pagination*, *filtering*, dan *sorting* di endpoint `/api/reviews` agar browser tidak terbebani saat memuat 50.000+ data secara bersamaan, sehingga performa *Data Explorer* menjadi sangat ringan.
+
+#### 3. Live Prediction API (Algorithm Lab)
+Halaman "Algorithm Lab" (Analisis Sentimen Real-time) membutuhkan otak di belakangnya:
+- Menyediakan endpoint POST `/api/predict` yang memuat (*load*) file `svm_model.pkl`, `nb_model.pkl`, dan `tfidf_vectorizer.pkl`.
+- Endpoint ini menerima teks ulasan mentah dari UI, menjalankan fungsi *text preprocessing* (Sastrawi, NLP cleaning), lalu mengembalikan hasil prediksi sentimen (Positif/Negatif/Netral) secara *real-time*.
+
+#### 4. Model Retraining API
+Seiring berjalannya waktu dan bertambahnya ulasan baru, model ML akan usang (*model drift*):
+- Menyediakan endpoint khusus `/api/model/retrain` untuk memicu ulang proses *Stratified K-Fold Cross Validation* secara *background*.
+- Backend secara otomatis mencatat dan membandingkan akurasi (F1-Score) model versi lama vs versi baru ke dalam *database*, lalu memberi laporan ke dashboard UI.
+
+#### 5. Sistem Autentikasi (JWT Security)
+- Mengunci fitur-fitur kritikal seperti *Mulai Scraping*, *Hapus Data*, dan *Model Retraining* agar hanya bisa diakses oleh *user admin* yang sah.
+- Menerapkan arsitektur keamanan berbasis token JWT (JSON Web Token) di *header* setiap permintaan ke API Flask.
 
 ---
 

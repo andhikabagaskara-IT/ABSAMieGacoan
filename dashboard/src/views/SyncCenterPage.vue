@@ -32,19 +32,14 @@
     <!-- Row 1: Scraper & Upload -->
     <div class="top-row">
       <div class="scraper-wrapper">
-        <ScraperInput @start="startSimulation" />
+        <ScraperInput @start="openParameterModal" />
       </div>
       <div class="upload-wrapper">
         <CsvUploader @upload="handleUpload" />
       </div>
     </div>
 
-    <!-- Row 2: Parameters -->
-    <div class="parameter-wrapper">
-      <ParameterFilter />
-    </div>
-
-    <!-- Row 3: Monitor -->
+    <!-- Row 2: Monitor -->
     <div class="monitor-wrapper">
       <PipelineMonitor 
         :isActive="isProcessing" 
@@ -56,6 +51,17 @@
     </div>
 
     <!-- Modals -->
+    <!-- Parameter Scraper Modal -->
+    <div class="modal-overlay" v-if="showParameterModal">
+      <div class="modal-content card param-modal-content">
+        <ParameterFilter />
+        <div class="modal-actions mt-4">
+          <button class="btn btn-outline" @click="showParameterModal = false">Batal</button>
+          <button class="btn btn-primary" @click="confirmStartScraping">Mulai scraping</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Export Completion Modal -->
     <div class="modal-overlay" v-if="showExportModal">
       <div class="modal-content card">
@@ -99,7 +105,21 @@ const progress = ref(0)
 const speed = ref(0)
 const eta = ref('--:--')
 
+// Modals State
+const showExportModal = ref(false)
+const confirmModalData = ref(null)
+const showParameterModal = ref(false)
+
 let simInterval = null
+
+const openParameterModal = () => {
+  showParameterModal.value = true
+}
+
+const confirmStartScraping = () => {
+  showParameterModal.value = false
+  startSimulation()
+}
 
 const startSimulation = () => {
   if (isProcessing.value) return
@@ -151,10 +171,7 @@ const handleUpload = (file) => {
   startSimulation()
 }
 
-// Modals State
-const showExportModal = ref(false)
-const confirmModalData = ref(null)
-
+// Confirm actions
 const requestAction = (type) => {
   if (type === 'restart') {
     confirmModalData.value = {
@@ -351,5 +368,13 @@ const handleExportChoice = (choice) => {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+}
+
+.param-modal-content {
+  max-width: 600px;
+}
+
+.mt-4 {
+  margin-top: 1.5rem;
 }
 </style>
