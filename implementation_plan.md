@@ -90,10 +90,26 @@ scrapinggacoan2026/
 │   ├── 05_classification.py          # Tahap 5: Stratified K-Fold CV + SMOTE + SVM & NB
 │   ├── 06_lda_aspect.py              # Tahap 6: Ekstraksi aspek dengan LDA
 │   └── 07_export_dashboard.py        # Tahap 7: Export data JSON untuk dashboard
-├── backend/                          # Flask REST API Backend
-│   ├── app.py                        # Main Flask application
-│   ├── config.py                     # Konfigurasi path & CORS
-│   └── requirements.txt              # Dependencies Flask
+├── backend/                          # Flask REST API Backend (Fullstack)
+│   ├── app.py                        # Main Flask App Factory
+│   ├── config.py                     # Konfigurasi PostgreSQL, JWT, CORS
+│   ├── requirements.txt              # Dependencies Backend
+│   ├── .env.example                  # Template environment variables
+│   ├── models/                       # SQLAlchemy ORM Models
+│   │   ├── __init__.py
+│   │   ├── database.py               # Instance SQLAlchemy
+│   │   ├── user.py                   # Model User (3 Role)
+│   │   ├── review.py                 # Model Review (JSONB preprocessing)
+│   │   ├── analysis.py               # Model Hasil Analisis ML
+│   │   └── pipeline_log.py           # Model Log Pipeline
+│   └── routes/                       # Blueprint API Routes
+│       ├── __init__.py
+│       ├── auth.py                   # Login, Register, JWT, RBAC
+│       ├── dashboard.py              # Data Agregasi Dashboard
+│       ├── reviews.py                # Server-side Pagination
+│       ├── predict.py                # Live Prediction (SVM/NB)
+│       ├── pipeline.py               # Pipeline Execution
+│       └── admin.py                  # User Management & Migrasi
 ├── dashboard/                        # VueJS Dashboard
 │   ├── src/
 │   │   ├── components/
@@ -312,34 +328,57 @@ Fitur-fitur dashboard untuk manajemen restoran:
 
 ---
 
-### Tahap 9: Pengembangan Backend Fullstack (Rencana Kerja Terperinci)
+### Tahap 9: Pengembangan Backend Fullstack (✅ SELESAI)
 
-Backend Flask saat ini sudah disiapkan sebagai kerangka (skeleton) awal API. Ke depannya, backend ini idealnya dimanfaatkan dan dikembangkan menjadi pusat arsitektur (*Fullstack Integration*) dengan rencana kerja berikut:
+Backend Flask telah dikembangkan menjadi arsitektur **fullstack modular** dengan **PostgreSQL**, **Flask-JWT-Extended**, dan **Blueprint-based routing**. Berikut detail implementasi per sub-tahap:
 
-#### 1. Real-time Pipeline Execution (Pusat Kendali Sync Center)
-Saat ini simulasi Sync Center di frontend hanya sebuah animasi UI. Idealnya:
-- Backend bertugas mengeksekusi script Python secara langsung (dari `01_scraping.py` hingga `07_export_dashboard.py`) menggunakan mekanisme *subprocess* atau *task queue* (misal: Celery).
-- Menyediakan endpoint **WebSocket** atau **Server-Sent Events (SSE)** agar frontend dapat menampilkan *progress bar* yang aktual per tahapan.
-- Menerima parameter *scraper* dari UI (tahun, limit, daftar target cabang) via POST `/api/sync/start` lalu menyuntikkannya sebagai *arguments* ke eksekusi script.
+#### ✅ Sub-1: Real-time Pipeline Execution (Pusat Kendali Sync Center)
+- **Implementasi**: `routes/pipeline.py` — endpoint `POST /api/pipeline/start` menerima parameter pipeline dan menjalankan script Python secara *background* via `threading` + `subprocess`.
+- **Fitur**: Mendukung eksekusi `full` (semua script), `retrain` (classification → LDA → export), atau script individual.
+- **Monitoring**: Setiap eksekusi tercatat di tabel `pipeline_logs` (model `PipelineLog`) dengan tracking `status`, `progress`, `error_message`, dan `output_summary`.
+- **Endpoint**: `GET /api/pipeline/status/<id>` untuk cek status, `GET /api/pipeline/history` untuk riwayat eksekusi.
 
-#### 2. Server-side Data Management (Database Integration)
-Saat ini proyek bergantung pada parsing file JSON berukuran puluhan MB ke dalam *memory browser*. Idealnya:
-- Memigrasi penyimpanan data dari file CSV/JSON statis ke sistem *Relational Database* seperti PostgreSQL atau MySQL.
-- Menangani *server-side pagination*, *filtering*, dan *sorting* di endpoint `/api/reviews` agar browser tidak terbebani saat memuat 50.000+ data secara bersamaan, sehingga performa *Data Explorer* menjadi sangat ringan.
+#### ✅ Sub-2: Server-side Data Management (PostgreSQL Integration)
+- **Database**: PostgreSQL dengan SQLAlchemy ORM (`models/database.py`).
+- **Model Review**: Tabel `reviews` menyimpan data ulasan dengan kolom **JSONB** (`preprocessing_data`) untuk menyimpan hasil preprocessing teks secara fleksibel.
+- **Server-side Pagination**: `routes/reviews.py` — endpoint `GET /api/reviews` mendukung pagination, filtering (cabang, sentimen, aspek, rating), sorting, dan search langsung di SQL query — bukan lagi parsing CSV 20MB di memori browser.
+- **Migrasi Data**: `routes/admin.py` — endpoint `POST /api/admin/migrate-csv` untuk one-time migration dari `reviews_with_aspects.csv` ke PostgreSQL secara batch (1000 record per batch).
+- **Model Tambahan**: `AnalysisResult` (tabel `analysis_results`) menyimpan snapshot hasil K-Fold/LDA secara terversioned dengan kolom JSONB.
 
-#### 3. Live Prediction API (Algorithm Lab)
-Halaman "Algorithm Lab" (Analisis Sentimen Real-time) membutuhkan otak di belakangnya:
-- Menyediakan endpoint POST `/api/predict` yang memuat (*load*) file `svm_model.pkl`, `nb_model.pkl`, dan `tfidf_vectorizer.pkl`.
-- Endpoint ini menerima teks ulasan mentah dari UI, menjalankan fungsi *text preprocessing* (Sastrawi, NLP cleaning), lalu mengembalikan hasil prediksi sentimen (Positif/Negatif/Netral) secara *real-time*.
+#### ✅ Sub-3: Live Prediction API (Algorithm Lab)
+- **Implementasi**: `routes/predict.py` — endpoint `POST /api/predict` memuat model SVM, NB, dan TF-IDF vectorizer dari file pickle.
+- **Preprocessing Real-time**: Mereplikasi seluruh pipeline dari `scripts/04_preprocessing.py` (cleaning → case folding → normalisasi slang → stopword removal → stemming Sastrawi) secara inline.
+- **Output**: Mengembalikan label sentimen dari kedua model beserta confidence scores.
+- **Model Caching**: Model dimuat sekali lalu di-cache di memori untuk respons cepat.
+- **Status Check**: `GET /api/predict/status` untuk verifikasi ketersediaan file model.
 
-#### 4. Model Retraining API
-Seiring berjalannya waktu dan bertambahnya ulasan baru, model ML akan usang (*model drift*):
-- Menyediakan endpoint khusus `/api/model/retrain` untuk memicu ulang proses *Stratified K-Fold Cross Validation* secara *background*.
-- Backend secara otomatis mencatat dan membandingkan akurasi (F1-Score) model versi lama vs versi baru ke dalam *database*, lalu memberi laporan ke dashboard UI.
+#### ✅ Sub-4: Model Retraining API
+- **Implementasi**: Terintegrasi di `routes/pipeline.py` dengan mode `retrain`.
+- **Alur**: `POST /api/pipeline/start` dengan `{"pipeline": "retrain"}` memicu urutan `05_classification.py` → `06_lda_aspect.py` → `07_export_dashboard.py` secara background.
+- **Versioning**: Hasil analisis disimpan ke tabel `analysis_results` dengan kolom `version` yang auto-increment untuk membandingkan performa antar versi model.
 
-#### 5. Sistem Autentikasi (JWT Security)
-- Mengunci fitur-fitur kritikal seperti *Mulai Scraping*, *Hapus Data*, dan *Model Retraining* agar hanya bisa diakses oleh *user admin* yang sah.
-- Menerapkan arsitektur keamanan berbasis token JWT (JSON Web Token) di *header* setiap permintaan ke API Flask.
+#### ✅ Sub-5: Sistem Autentikasi (JWT Security — 3 Role)
+- **Library**: Flask-JWT-Extended (access token + refresh token).
+- **3 Role Pengguna** (model `User` di `models/user.py`):
+
+| Role | Nama | Deskripsi | Hak Akses |
+|------|------|-----------|------------|
+| `admin` | Manajemen | Full access | CRUD user, scraping, retrain, hapus data, migrasi DB |
+| `analyst` | Marketing / Data Scientist | Analisis & prediksi | Lihat dashboard, prediksi sentimen, export, riwayat pipeline |
+| `user` | Pegawai / Staf Biasa | Read-only | Lihat dashboard, data explorer, profil sendiri |
+
+- **RBAC Decorator**: `@role_required(UserRole.ADMIN, UserRole.ANALYST)` di `routes/auth.py` — memastikan hanya role yang diizinkan yang bisa mengakses endpoint tertentu.
+- **Password Hashing**: bcrypt (salt-based).
+- **Auto-Seeding**: Saat pertama kali dijalankan, database otomatis membuat 3 akun default:
+  - `admin@miegacoan.com` / `admin123` (Admin)
+  - `analyst@miegacoan.com` / `analyst123` (Analyst)
+  - `staff@miegacoan.com` / `staff123` (User)
+- **Endpoint Auth**:
+  - `POST /api/auth/login` — Login & dapatkan JWT token
+  - `POST /api/auth/register` — Register user baru (admin only)
+  - `POST /api/auth/refresh` — Refresh access token
+  - `GET /api/auth/profile` — Lihat profil sendiri
+  - `PUT /api/auth/profile` — Update profil & ganti password
 
 ---
 
@@ -365,20 +404,20 @@ Seiring berjalannya waktu dan bertambahnya ulasan baru, model ML akan usang (*mo
 
 ## Urutan Pengerjaan
 
-| No  | Tahap                                         | Script                    | Status           |
-| --- | --------------------------------------------- | ------------------------- | ---------------- |
-| 1   | Setup environment + Install dependencies      | `requirements.txt`        | ✅ Selesai       |
-| 2   | Scraping data 12 cabang                       | `01_scraping.py`          | ✅ Selesai       |
-| 3   | Quality Check & Combining                     | `02_quality_check.py`     | ✅ Selesai       |
-| 4   | Pelabelan sentimen                            | `03_labeling.py`          | ✅ Selesai       |
-| 5   | Preprocessing data NLP                        | `04_preprocessing.py`     | ✅ Selesai       |
-| 6   | Klasifikasi: Stratified K-Fold CV + SMOTE     | `05_classification.py`    | 🔄 Berjalan     |
-| 7   | Ekstraksi aspek LDA                           | `06_lda_aspect.py`        | ✅ Selesai       |
-| 8   | Export data untuk dashboard                   | `07_export_dashboard.py`  | ✅ Selesai       |
-| 9   | Dashboard VueJS (Frontend)                    | `dashboard/`              | ✅ Selesai      |
-| 10  | Backend API (REST Server)                     | `backend/`                | ✅ Selesai      |
+| No  | Tahap                                         | Script / Modul              | Status           |
+| --- | --------------------------------------------- | --------------------------- | ---------------- |
+| 1   | Setup environment + Install dependencies      | `requirements.txt`          | ✅ Selesai       |
+| 2   | Scraping data 12 cabang                       | `01_scraping.py`            | ✅ Selesai       |
+| 3   | Quality Check & Combining                     | `02_quality_check.py`       | ✅ Selesai       |
+| 4   | Pelabelan sentimen                            | `03_labeling.py`            | ✅ Selesai       |
+| 5   | Preprocessing data NLP                        | `04_preprocessing.py`       | ✅ Selesai       |
+| 6   | Klasifikasi: Stratified K-Fold CV + SMOTE     | `05_classification.py`      | 🔄 Berjalan     |
+| 7   | Ekstraksi aspek LDA                           | `06_lda_aspect.py`          | ✅ Selesai       |
+| 8   | Export data untuk dashboard                   | `07_export_dashboard.py`    | ✅ Selesai       |
+| 9   | Dashboard VueJS (Frontend)                    | `dashboard/`                | ✅ Selesai       |
+| 10  | Backend Fullstack (PostgreSQL + JWT + 3 Role) | `backend/`                  | ✅ Selesai       |
 
-> **Seluruh tahapan dari 1-10 telah diselesaikan.** Pipeline ML kini mencakup penentuan otomatis topik LDA, dashboard sentimen lengkap (3 Kelas), data explorer 50.000+ data, serta penyediaan Flask API backend.
+> **Seluruh tahapan dari 1-10 telah diselesaikan.** Pipeline ML kini mencakup penentuan otomatis topik LDA, dashboard sentimen lengkap (3 Kelas), data explorer 50.000+ data, serta backend fullstack dengan PostgreSQL, JWT authentication, dan 3-role RBAC.
 
 > **Cara menjalankan ulang pipeline lengkap:**
 > ```bash
@@ -389,9 +428,92 @@ Seiring berjalannya waktu dan bertambahnya ulasan baru, model ML akan usang (*mo
 > python scripts/05_classification.py
 > python scripts/06_lda_aspect.py
 > python scripts/07_export_dashboard.py
+> ```
+
+> **Cara menjalankan Backend Fullstack:**
+> ```bash
+> # 1. Pastikan PostgreSQL berjalan & database 'miegacoan_absa' sudah dibuat
+> #    CREATE DATABASE miegacoan_absa;
 > 
-> # (Opsional) Jalankan Backend API
+> # 2. Salin dan sesuaikan .env
 > cd backend
+> copy .env.example .env
+> 
+> # 3. Install dependencies & jalankan
 > pip install -r requirements.txt
 > python app.py
+> 
+> # 4. (Pertama kali) Migrasi data CSV ke PostgreSQL
+> #    POST http://localhost:5000/api/admin/migrate-csv
+> #    dengan header: Authorization: Bearer <admin_token>
 > ```
+
+---
+
+## Rangkuman Pengerjaan Backend Fullstack
+
+### Arsitektur yang Diimplementasikan
+
+Backend telah di-refactor dari monolitik (`app.py` satu file) menjadi arsitektur **modular Blueprint-based** dengan komponen-komponen berikut:
+
+| Komponen | File | Deskripsi |
+|----------|------|-----------|
+| App Factory | `app.py` | Pattern factory dengan `create_app()` untuk testability |
+| Konfigurasi | `config.py` | PostgreSQL URI, JWT config, CORS, multi-environment |
+| ORM Models | `models/*.py` | 4 tabel: `users`, `reviews`, `analysis_results`, `pipeline_logs` |
+| Auth + RBAC | `routes/auth.py` | JWT login/register/refresh, decorator `@role_required` |
+| Dashboard API | `routes/dashboard.py` | Serving data agregasi dari JSON files |
+| Reviews API | `routes/reviews.py` | Server-side pagination + SQL filtering |
+| Predict API | `routes/predict.py` | Real-time sentiment prediction (SVM/NB) |
+| Pipeline API | `routes/pipeline.py` | Background script execution + monitoring |
+| Admin API | `routes/admin.py` | User CRUD, CSV→DB migration, DB stats |
+
+### Teknologi Stack Backend
+
+| Teknologi | Versi | Fungsi |
+|-----------|-------|--------|
+| Flask | ≥3.0 | Web framework |
+| Flask-JWT-Extended | ≥4.6 | Autentikasi token JWT |
+| PostgreSQL | ≥14 | Database relasional + JSONB |
+| SQLAlchemy | ≥2.0 | ORM (Object-Relational Mapping) |
+| Flask-Migrate | ≥4.0 | Database migration (Alembic) |
+| bcrypt | ≥4.1 | Password hashing |
+| Sastrawi + NLTK | — | NLP preprocessing untuk prediksi |
+
+### Keunggulan PostgreSQL JSONB
+
+Kolom `JSONB` digunakan pada:
+- `reviews.preprocessing_data` — Menyimpan hasil preprocessing per tahap tanpa perlu 6 kolom terpisah
+- `analysis_results.results_data` — Menyimpan output K-Fold/LDA yang struktur berbeda tiap tipe analisis
+- `pipeline_logs.parameters` & `output_summary` — Menyimpan parameter & hasil eksekusi yang bervariasi
+
+Ini memberikan fleksibilitas skema tanpa mengorbankan kemampuan query relasional.
+
+---
+
+## Rekomendasi Pengerjaan Lanjutan
+
+### Prioritas Tinggi 🔴
+
+| No | Rekomendasi | Detail |
+|----|-------------|--------|
+| 1 | **Integrasi Frontend ↔ Backend JWT** | Modifikasi VueJS dashboard agar login dulu sebelum akses data. Simpan token di `localStorage`, kirim via header `Authorization: Bearer <token>` di setiap request Axios. |
+| 2 | **Migrasi Data Explorer ke Server-side** | Ganti mekanisme Data Explorer yang saat ini memuat JSON 20MB di browser, menjadi memanggil `GET /api/reviews?page=1&per_page=25&branch=...` dari backend PostgreSQL. |
+| 3 | **Koneksi Algorithm Lab ke `/api/predict`** | Halaman prediksi real-time di dashboard saat ini belum terhubung ke backend. Hubungkan input teks ke endpoint `POST /api/predict`. |
+
+### Prioritas Sedang 🟡
+
+| No | Rekomendasi | Detail |
+|----|-------------|--------|
+| 4 | **WebSocket / SSE untuk Sync Center** | Saat ini pipeline monitoring menggunakan polling `GET /api/pipeline/status/<id>`. Idealnya gunakan WebSocket atau SSE agar progress bar di UI update secara *push-based* real-time. |
+| 5 | **Implementasi Celery Task Queue** | Untuk pipeline yang berat (scraping, training), ganti `threading` dengan Celery + Redis agar lebih robust, mendukung retry, dan bisa di-scale horizontal. |
+| 6 | **Role-based UI Rendering** | Sesuaikan tampilan dashboard berdasarkan role: sembunyikan menu Admin/Retrain untuk `user`, sembunyikan User Management untuk `analyst`. |
+
+### Prioritas Rendah 🟢
+
+| No | Rekomendasi | Detail |
+|----|-------------|--------|
+| 7 | **Token Blacklisting (Logout)** | Implementasi Redis-based token blacklist agar token yang di-revoke (logout) benar-benar tidak bisa dipakai lagi. |
+| 8 | **Rate Limiting** | Tambahkan `flask-limiter` untuk membatasi jumlah request per IP/user, mencegah abuse pada endpoint prediksi. |
+| 9 | **API Documentation (Swagger)** | Gunakan `flask-smorest` atau `flasgger` untuk auto-generate dokumentasi API interaktif. |
+| 10 | **Unit & Integration Testing** | Buat test suite menggunakan `pytest` + `pytest-flask` untuk semua endpoint, termasuk test RBAC. |
