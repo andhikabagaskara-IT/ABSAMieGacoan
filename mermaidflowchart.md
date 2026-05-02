@@ -50,7 +50,7 @@ graph TD
 5. **Classification**: Melatih model dengan mengatasi ketidakseimbangan data (SMOTE) dan divalidasi dengan K-Fold untuk hasil objektif.
 6. **LDA Aspect**: Mengekstrak topik utama secara dinamis berdasarkan skor evaluasi DBI terendah (Range K=3-10) beserta pembuatan Word Cloud untuk visualisasi.
 7. **Export**: Mempersiapkan dataset JSON akhir.
-8. **Backend API**: REST API fullstack (Flask + PostgreSQL + JWT) untuk autentikasi, data serving, dan prediksi real-time.
+8. **Backend API**: REST API fullstack (Flask + PostgreSQL + JWT) untuk autentikasi 3 role, data serving, prediksi real-time, token blacklisting, rate limiting, dan CSV export.
 9. **Dashboard**: Menampilkan metrik (Positif, Negatif, Netral), analisis cabang dengan sampel seimbang, performa algoritma, evaluasi DBI, dan tool sentimen secara interaktif dengan dukungan *Dark Mode*.
 
 ---
@@ -65,12 +65,12 @@ Menunjukkan sistem ABSA Mie Gacoan sebagai satu proses tunggal beserta entitas e
 graph LR
     GM["Google Maps<br/>(Sumber Data)"] -->|Ulasan Pelanggan| SYS["Sistem ABSA<br/>Mie Gacoan"]
     ADM["Admin<br/>(Manajemen)"] -->|Perintah Scraping,<br/>Kelola User,<br/>Retrain Model| SYS
-    ANL["Analyst<br/>(Marketing/Data Scientist)"] -->|Input Teks Prediksi,<br/>Request Analisis| SYS
+    ANL["Analyst<br/>(Marketing/Data Scientist)"] -->|Input Teks Prediksi,<br/>Perintah Scraping,<br/>Request Analisis| SYS
     USR["User<br/>(Pegawai/Staf)"] -->|Request Data<br/>Dashboard| SYS
 
     SYS -->|Data CSV Mentah| GM
     SYS -->|Dashboard Analisis,<br/>Manajemen User,<br/>Log Pipeline| ADM
-    SYS -->|Hasil Prediksi,<br/>Dashboard Analisis,<br/>Export Data| ANL
+    SYS -->|Hasil Prediksi,<br/>Dashboard Analisis,<br/>Export CSV| ANL
     SYS -->|Dashboard Read-only,<br/>Data Explorer| USR
 
     classDef external fill:#FFE0B2,stroke:#F57C00,stroke-width:2px,color:#000
@@ -111,6 +111,7 @@ graph TD
     %% Alur Data
     GM -->|"Ulasan HTML"| P1
     ADM -->|"Parameter Scraping"| P1
+    ANL -->|"Parameter Scraping"| P1
     ADM -->|"Kredensial, Data User"| P5
     ANL -->|"Teks Ulasan"| P6
     ANL -->|"Kredensial"| P5
@@ -170,6 +171,7 @@ graph TD
     DS_LOG[("DS_LOG<br/>pipeline_logs<br/>(PostgreSQL)")]
 
     ADM -->|"Target Cabang,<br/>Limit, Filter Tahun"| P1_1
+    ANL -->|"Target Cabang,<br/>Limit, Filter Tahun"| P1_1
     GM -->|"HTML Ulasan"| P1_1
 
     P1_1 -->|"CSV per cabang:<br/>nama, tanggal, rating, teks"| DS1
@@ -184,7 +186,7 @@ graph TD
     classDef proc fill:#BBDEFB,stroke:#1565C0,stroke-width:2px,color:#000
     classDef store fill:#C8E6C9,stroke:#2E7D32,stroke-width:2px,color:#000
 
-    class GM,ADM ext
+    class GM,ADM,ANL ext
     class P1_1,P1_2,P1_3 proc
     class DS1,DS2,DS_LOG store
 ```
@@ -292,9 +294,11 @@ graph TD
 
 | Proses | Admin | Analyst | User |
 |--------|-------|---------|------|
-| P1 — Akuisisi Data (Scraping) | ✅ Mulai/Stop | ❌ | ❌ |
-| P2 — Analisis NLP | ✅ Trigger | ❌ | ❌ |
+| P1 — Akuisisi Data (Scraping) | ✅ Mulai/Stop | ✅ Mulai/Stop | ❌ |
+| P2 — Analisis NLP | ✅ Trigger | ✅ Trigger | ❌ |
 | P3 — Pemodelan ML (Retrain) | ✅ Trigger | ✅ Trigger | ❌ |
 | P4 — Penyajian Data (Dashboard) | ✅ Full | ✅ Full | ✅ Read-only |
 | P5 — Autentikasi (Register User) | ✅ CRUD User | ❌ | ❌ |
 | P6 — Prediksi Real-time | ✅ Prediksi | ✅ Prediksi | ❌ |
+| Export CSV | ✅ Export | ✅ Export | ❌ |
+| Token Blacklist (Logout) | ✅ | ✅ | ✅ |

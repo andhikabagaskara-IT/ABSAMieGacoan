@@ -2,21 +2,22 @@
 routes/pipeline.py — Pipeline Execution Routes (Sync Center)
 =============================================================
 Endpoint untuk memicu eksekusi pipeline ML secara background.
-Akses: admin only (scraping, retrain)
-        admin & analyst (retrain model)
+Akses: admin & analyst (scraping, retrain, export)
 """
 
 import os
+import io
+import csv
 import subprocess
 import threading
 import logging
 from datetime import datetime, timezone
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, Response
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from config import BASE_DIR
-from models import db, PipelineLog, UserRole
+from config import BASE_DIR, EXPORT_DIR
+from models import db, PipelineLog, Review, UserRole
 from routes.auth import role_required
 
 log = logging.getLogger(__name__)
@@ -58,7 +59,7 @@ def _run_script_async(script_name, pipeline_log_id, app):
 
 
 @pipeline_bp.route('/start', methods=['POST'])
-@role_required(UserRole.ADMIN)
+@role_required(UserRole.ADMIN, UserRole.ANALYST)
 def start_pipeline():
     """
     Mulai eksekusi pipeline.
@@ -128,4 +129,118 @@ def pipeline_history():
     return jsonify({
         'logs': [l.to_dict() for l in pagination.items],
         'total': pagination.total,
+    })
+
+
+# ─── GET /api/pipeline/export-csv ────────────────────────────────────────────
+
+@pipeline_bp.route('/export-csv', methods=['GET'])
+@role_required(UserRole.ADMIN, UserRole.ANALYST)
+def export_reviews_csv():
+    """
+    Export data ulasan dari database ke file CSV yang dapat didownload.
+    Mendukung filter yang sama dengan /api/reviews.
+    """
+    from sqlalchemy import func, or_
+
+    query = Review.query
+
+    # Filters
+    branch = request.args.get('branch', '').strip()
+    sentiment = request.args.get('sentiment', '').strip()
+    aspect = request.args.get('aspect', '').strip()
+
+    if branch:
+        query = query.filter(Review.nama_cabang == branch)
+    if sentiment:
+        query = query.filter(Review.sentimen == sentiment)
+    if aspect:
+        query = query.filter(Review.aspek_lda == aspect)
+
+    reviews = query.order_by(Review.id.asc()).all()
+
+    # Build CSV in memory
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['id', 'nama_cabang', 'nama_pelanggan', 'tanggal_ulasan',
+                     'rating', 'teks_komentar', 'sentimen', 'aspek_lda'])
+
+    for r in reviews:
+        writer.writerow([
+            r.id, r.nama_cabang, r.nama_pelanggan, r.tanggal_ulasan,
+            r.rating, r.teks_komentar, r.sentimen, r.aspek_lda
+        ])
+
+    csv_data = output.getvalue()
+    output.close()
+
+    return Response(
+        csv_data,
+        mimetype='text/csv',
+        headers={'Content-Disposition': 'attachment; filename=reviews_export.csv'}
+    )
+
+
+# ─── GET /api/pipeline/role-permissions ──────────────────────────────────────
+
+@pipeline_bp.route('/role-permissions', methods=['GET'])
+@jwt_required()
+def get_role_permissions():
+    """
+    Mengembalikan daftar permissions berdasarkan role user yang login.
+    Digunakan oleh frontend untuk role-based UI rendering.
+    """
+    current_user_id = get_jwt_identity()
+    from models import User
+    user = db.session.get(User, int(current_user_id))
+
+    if not user:
+        return jsonify({'error': 'User tidak ditemukan'}), 404
+
+    # Permission map per role
+    permissions = {
+        UserRole.ADMIN: {
+            'can_view_dashboard': True,
+            'can_view_data_explorer': True,
+            'can_predict_sentiment': True,
+            'can_start_scraping': True,
+            'can_retrain_model': True,
+            'can_export_data': True,
+            'can_manage_users': True,
+            'can_delete_data': True,
+            'can_migrate_db': True,
+            'can_view_pipeline_history': True,
+            'can_clear_cache': True,
+        },
+        UserRole.ANALYST: {
+            'can_view_dashboard': True,
+            'can_view_data_explorer': True,
+            'can_predict_sentiment': True,
+            'can_start_scraping': True,
+            'can_retrain_model': True,
+            'can_export_data': True,
+            'can_manage_users': False,
+            'can_delete_data': False,
+            'can_migrate_db': False,
+            'can_view_pipeline_history': True,
+            'can_clear_cache': True,
+        },
+        UserRole.USER: {
+            'can_view_dashboard': True,
+            'can_view_data_explorer': True,
+            'can_predict_sentiment': False,
+            'can_start_scraping': False,
+            'can_retrain_model': False,
+            'can_export_data': False,
+            'can_manage_users': False,
+            'can_delete_data': False,
+            'can_migrate_db': False,
+            'can_view_pipeline_history': False,
+            'can_clear_cache': False,
+        },
+    }
+
+    return jsonify({
+        'user': user.to_dict(),
+        'permissions': permissions.get(user.role, permissions[UserRole.USER]),
     })

@@ -1,12 +1,12 @@
 """
 routes/auth.py — Authentication Routes (JWT)
 ==============================================
-Endpoint untuk login, register, refresh token, dan profil user.
+Endpoint untuk login, register, refresh token, logout, dan profil user.
 Menggunakan Flask-JWT-Extended.
 
 Kebijakan Akses Role:
   - admin    : Full access — kelola user, scraping, retrain, hapus data
-  - analyst  : Analisis, prediksi, export — tidak bisa kelola user/scraping
+  - analyst  : Analisis, prediksi, export, scraping — tidak bisa kelola user
   - user     : Read-only — dashboard, data explorer, lihat profil sendiri
 """
 
@@ -25,6 +25,11 @@ from flask_jwt_extended import (
 from models import db, User, UserRole
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
+
+# ─── Token Blacklist (In-Memory) ─────────────────────────────────────────────
+# Menyimpan JTI (JWT ID) dari token yang telah di-revoke via logout.
+# Di production, sebaiknya diganti dengan Redis.
+_token_blacklist = set()
 
 
 # ─── Decorator: Role-Based Access Control ────────────────────────────────────
@@ -251,3 +256,19 @@ def update_profile():
         'message': 'Profil berhasil diperbarui',
         'user': user.to_dict(),
     }), 200
+
+
+# ─── POST /api/auth/logout ───────────────────────────────────────────────────
+
+@auth_bp.route('/logout', methods=['POST'])
+@jwt_required()
+def logout():
+    """Logout — masukkan token ke blacklist agar tidak bisa dipakai lagi."""
+    jti = get_jwt()['jti']
+    _token_blacklist.add(jti)
+    return jsonify({'message': 'Berhasil logout. Token telah dicabut.'}), 200
+
+
+def is_token_revoked(jti: str) -> bool:
+    """Cek apakah token sudah di-blacklist."""
+    return jti in _token_blacklist

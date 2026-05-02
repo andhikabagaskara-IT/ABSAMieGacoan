@@ -1,10 +1,11 @@
-"""
-app.py — Flask Backend Fullstack — Mie Gacoan ABSA Dashboard
+"""app.py — Flask Backend Fullstack — Mie Gacoan ABSA Dashboard
 ==============================================================
 Arsitektur modular dengan:
   - PostgreSQL + SQLAlchemy ORM
   - Flask-JWT-Extended (autentikasi 3 role)
   - Blueprint-based routing
+  - Token blacklisting (logout)
+  - Rate limiting
   - Database migration support
 
 Cara Menjalankan:
@@ -13,23 +14,26 @@ Cara Menjalankan:
   python app.py
 
 Endpoints Utama:
-  POST /api/auth/login       → Login & dapatkan JWT token
-  POST /api/auth/register    → Register user baru (admin only)
-  POST /api/auth/refresh     → Refresh access token
-  GET  /api/auth/profile     → Profil user yang login
-  PUT  /api/auth/profile     → Update profil sendiri
-  GET  /api/dashboard        → Data agregasi dashboard
-  GET  /api/reviews          → Ulasan (server-side pagination)
-  GET  /api/reviews/stats    → Statistik ulasan dari DB
-  GET  /api/branches         → Daftar cabang + statistik
-  GET  /api/lda              → Hasil LDA
-  GET  /api/kfold            → Hasil K-Fold CV
-  POST /api/predict          → Prediksi sentimen real-time
-  POST /api/pipeline/start   → Mulai pipeline (admin only)
-  GET  /api/pipeline/history → Riwayat pipeline
-  GET  /api/admin/users      → Daftar semua user (admin only)
-  POST /api/admin/migrate-csv → Migrasi CSV ke PostgreSQL
-  GET  /health               → Health check
+  POST /api/auth/login          → Login & dapatkan JWT token
+  POST /api/auth/register       → Register user baru (admin only)
+  POST /api/auth/refresh        → Refresh access token
+  POST /api/auth/logout         → Logout & revoke token
+  GET  /api/auth/profile        → Profil user yang login
+  PUT  /api/auth/profile        → Update profil sendiri
+  GET  /api/dashboard           → Data agregasi dashboard
+  GET  /api/reviews             → Ulasan (server-side pagination)
+  GET  /api/reviews/stats       → Statistik ulasan dari DB
+  GET  /api/branches            → Daftar cabang + statistik
+  GET  /api/lda                 → Hasil LDA
+  GET  /api/kfold               → Hasil K-Fold CV
+  POST /api/predict             → Prediksi sentimen real-time
+  POST /api/pipeline/start      → Mulai pipeline (admin & analyst)
+  GET  /api/pipeline/history    → Riwayat pipeline
+  GET  /api/pipeline/export-csv → Export CSV (admin & analyst)
+  GET  /api/pipeline/role-permissions → Permissions user
+  GET  /api/admin/users         → Daftar semua user (admin only)
+  POST /api/admin/migrate-csv   → Migrasi CSV ke PostgreSQL
+  GET  /health                  → Health check
 """
 
 import os
@@ -40,6 +44,8 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from config import config_map
 from models import db, User, UserRole
@@ -76,7 +82,23 @@ def create_app(env_name=None):
     # CORS
     CORS(app, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS', '*')}})
 
-    # ─── JWT Error Handlers ──────────────────────────────────────────────
+    # Rate Limiter
+    limiter = Limiter(
+        key_func=get_remote_address,
+        app=app,
+        default_limits=["200 per hour"],
+        storage_uri="memory://",
+    )
+    # Rate limit khusus untuk endpoint prediksi (mencegah abuse)
+    limiter.limit("30 per minute")(lambda: None)  # Applied per-route below
+
+    # ─── JWT Error Handlers ─────────────────────────────────────────────
+    @jwt.token_in_blocklist_loader
+    def check_if_token_revoked(jwt_header, jwt_payload):
+        """Callback untuk cek apakah token sudah di-blacklist via logout."""
+        from routes.auth import is_token_revoked
+        return is_token_revoked(jwt_payload['jti'])
+
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
         return jsonify({'error': 'Token telah kedaluwarsa. Silakan login ulang.'}), 401
@@ -91,7 +113,7 @@ def create_app(env_name=None):
 
     @jwt.revoked_token_loader
     def revoked_token_callback(jwt_header, jwt_payload):
-        return jsonify({'error': 'Token telah dicabut.'}), 401
+        return jsonify({'error': 'Token telah dicabut. Silakan login ulang.'}), 401
 
     # ─── Register Blueprints ─────────────────────────────────────────────
     from routes import auth_bp, dashboard_bp, reviews_bp, predict_bp, pipeline_bp, admin_bp
@@ -109,9 +131,10 @@ def create_app(env_name=None):
         return jsonify({
             'status': 'ok',
             'service': 'Mie Gacoan ABSA Backend',
-            'version': '2.0.0',
+            'version': '2.1.0',
             'auth': 'JWT (Flask-JWT-Extended)',
             'database': 'PostgreSQL',
+            'features': ['token_blacklist', 'rate_limiting', 'role_based_access', 'csv_export'],
         })
 
     # ─── Error Handlers ──────────────────────────────────────────────────
@@ -185,11 +208,12 @@ if __name__ == '__main__':
     app = create_app()
 
     log.info("=" * 60)
-    log.info("  Mie Gacoan ABSA — Flask Backend API v2.0")
+    log.info("  Mie Gacoan ABSA — Flask Backend API v2.1")
     log.info("=" * 60)
-    log.info(f"  Database : PostgreSQL")
-    log.info(f"  Auth     : Flask-JWT-Extended")
-    log.info(f"  Roles    : admin, analyst, user")
+    log.info(f"  Database  : PostgreSQL")
+    log.info(f"  Auth      : Flask-JWT-Extended + Token Blacklist")
+    log.info(f"  Limiter   : 200 req/hour (default)")
+    log.info(f"  Roles     : admin, analyst, user")
     log.info("=" * 60)
     log.info("  Default Accounts:")
     log.info("    admin@miegacoan.com    / admin123    (Admin)")

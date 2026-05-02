@@ -358,17 +358,21 @@ Backend Flask telah dikembangkan menjadi arsitektur **fullstack modular** dengan
 - **Versioning**: Hasil analisis disimpan ke tabel `analysis_results` dengan kolom `version` yang auto-increment untuk membandingkan performa antar versi model.
 
 #### ✅ Sub-5: Sistem Autentikasi (JWT Security — 3 Role)
-- **Library**: Flask-JWT-Extended (access token + refresh token).
+- **Library**: Flask-JWT-Extended (access token + refresh token + token blacklisting).
 - **3 Role Pengguna** (model `User` di `models/user.py`):
 
 | Role | Nama | Deskripsi | Hak Akses |
 |------|------|-----------|------------|
-| `admin` | Manajemen | Full access | CRUD user, scraping, retrain, hapus data, migrasi DB |
-| `analyst` | Marketing / Data Scientist | Analisis & prediksi | Lihat dashboard, prediksi sentimen, export, riwayat pipeline |
+| `admin` | Manajemen | Full access | CRUD user, scraping, retrain, hapus data, migrasi DB, export |
+| `analyst` | Marketing / Data Scientist | Analisis, prediksi, & scraping | Dashboard, prediksi sentimen, scraping, retrain, export, riwayat pipeline |
 | `user` | Pegawai / Staf Biasa | Read-only | Lihat dashboard, data explorer, profil sendiri |
 
 - **RBAC Decorator**: `@role_required(UserRole.ADMIN, UserRole.ANALYST)` di `routes/auth.py` — memastikan hanya role yang diizinkan yang bisa mengakses endpoint tertentu.
 - **Password Hashing**: bcrypt (salt-based).
+- **Token Blacklisting**: Logout endpoint (`POST /api/auth/logout`) menambahkan JTI token ke blacklist in-memory sehingga token yang telah di-revoke tidak bisa dipakai lagi.
+- **Rate Limiting**: `flask-limiter` membatasi 200 request/jam per IP secara default, mencegah abuse pada endpoint prediksi.
+- **Role-based Permissions API**: `GET /api/pipeline/role-permissions` mengembalikan daftar permissions berdasarkan role — digunakan oleh frontend untuk menyembunyikan/menampilkan menu sesuai role.
+- **CSV Export**: `GET /api/pipeline/export-csv` — admin & analyst dapat mendownload data ulasan dari database dalam format CSV dengan filter cabang, sentimen, dan aspek.
 - **Auto-Seeding**: Saat pertama kali dijalankan, database otomatis membuat 3 akun default:
   - `admin@miegacoan.com` / `admin123` (Admin)
   - `analyst@miegacoan.com` / `analyst123` (Analyst)
@@ -377,6 +381,7 @@ Backend Flask telah dikembangkan menjadi arsitektur **fullstack modular** dengan
   - `POST /api/auth/login` — Login & dapatkan JWT token
   - `POST /api/auth/register` — Register user baru (admin only)
   - `POST /api/auth/refresh` — Refresh access token
+  - `POST /api/auth/logout` — Logout & revoke token (blacklist)
   - `GET /api/auth/profile` — Lihat profil sendiri
   - `PUT /api/auth/profile` — Update profil & ganti password
 
@@ -430,23 +435,133 @@ Backend Flask telah dikembangkan menjadi arsitektur **fullstack modular** dengan
 > python scripts/07_export_dashboard.py
 > ```
 
-> **Cara menjalankan Backend Fullstack:**
-> ```bash
-> # 1. Pastikan PostgreSQL berjalan & database 'miegacoan_absa' sudah dibuat
-> #    CREATE DATABASE miegacoan_absa;
-> 
-> # 2. Salin dan sesuaikan .env
-> cd backend
-> copy .env.example .env
-> 
-> # 3. Install dependencies & jalankan
-> pip install -r requirements.txt
-> python app.py
-> 
-> # 4. (Pertama kali) Migrasi data CSV ke PostgreSQL
-> #    POST http://localhost:5000/api/admin/migrate-csv
-> #    dengan header: Authorization: Bearer <admin_token>
-> ```
+### Panduan Lengkap Menjalankan Backend Fullstack (Step-by-Step)
+
+#### Langkah 1: Install PostgreSQL
+
+```bash
+# Windows — Download installer dari https://www.postgresql.org/download/windows/
+# Atau via Chocolatey:
+choco install postgresql
+
+# Pastikan PostgreSQL service berjalan
+# Cek via Services (services.msc) atau:
+pg_isready
+```
+
+#### Langkah 2: Buat Database
+
+```bash
+# Masuk ke PostgreSQL shell
+psql -U postgres
+
+# Di dalam psql, buat database:
+CREATE DATABASE miegacoan_absa;
+
+# Verifikasi
+\l
+
+# Keluar
+\q
+```
+
+#### Langkah 3: Konfigurasi Environment
+
+```bash
+# Pindah ke folder backend
+cd scrapinggacoan2026\backend
+
+# Salin template environment
+copy .env.example .env
+
+# Edit file .env sesuai konfigurasi PostgreSQL lokal:
+# DATABASE_URL=postgresql://postgres:PASSWORD_ANDA@localhost:5432/miegacoan_absa
+# Ganti PASSWORD_ANDA dengan password PostgreSQL Anda
+```
+
+#### Langkah 4: Install Dependencies Python
+
+```bash
+# Pastikan virtual environment aktif (opsional tapi disarankan)
+python -m venv venv
+venv\Scripts\activate
+
+# Install semua dependencies backend
+pip install -r requirements.txt
+```
+
+#### Langkah 5: Jalankan Backend Server
+
+```bash
+# Jalankan Flask server
+python app.py
+
+# Output yang diharapkan:
+# ============================================================
+#   Mie Gacoan ABSA — Flask Backend API v2.1
+# ============================================================
+#   Database  : PostgreSQL
+#   Auth      : Flask-JWT-Extended + Token Blacklist
+#   Limiter   : 200 req/hour (default)
+#   Roles     : admin, analyst, user
+# ============================================================
+#   Default Accounts:
+#     admin@miegacoan.com    / admin123    (Admin)
+#     analyst@miegacoan.com  / analyst123  (Analyst)
+#     staff@miegacoan.com    / staff123    (User)
+# ============================================================
+# * Running on http://0.0.0.0:5000
+```
+
+#### Langkah 6: Verifikasi Backend Berjalan
+
+```bash
+# Test health check
+curl http://localhost:5000/health
+
+# Test login (mendapatkan JWT token)
+curl -X POST http://localhost:5000/api/auth/login ^
+  -H "Content-Type: application/json" ^
+  -d "{\"email\": \"admin@miegacoan.com\", \"password\": \"admin123\"}"
+
+# Simpan access_token dari response untuk langkah selanjutnya
+```
+
+#### Langkah 7: Migrasi Data CSV ke PostgreSQL (Pertama Kali)
+
+```bash
+# Gunakan token admin dari langkah 6
+curl -X POST http://localhost:5000/api/admin/migrate-csv ^
+  -H "Authorization: Bearer TOKEN_ADMIN_ANDA"
+
+# Response: { "message": "Berhasil migrasi XXXXX ulasan ke database" }
+```
+
+#### Langkah 8: Test Endpoint Utama
+
+```bash
+# Ambil data reviews dengan pagination
+curl http://localhost:5000/api/reviews?page=1&per_page=10 ^
+  -H "Authorization: Bearer TOKEN_ANDA"
+
+# Test prediksi sentimen (admin/analyst only)
+curl -X POST http://localhost:5000/api/predict ^
+  -H "Content-Type: application/json" ^
+  -H "Authorization: Bearer TOKEN_ANDA" ^
+  -d "{\"text\": \"Mie nya enak banget, tempatnya nyaman\"}"
+
+# Cek permissions role
+curl http://localhost:5000/api/pipeline/role-permissions ^
+  -H "Authorization: Bearer TOKEN_ANDA"
+
+# Export CSV
+curl http://localhost:5000/api/pipeline/export-csv ^
+  -H "Authorization: Bearer TOKEN_ANDA" -o export.csv
+
+# Logout (revoke token)
+curl -X POST http://localhost:5000/api/auth/logout ^
+  -H "Authorization: Bearer TOKEN_ANDA"
+```
 
 ---
 
@@ -458,14 +573,14 @@ Backend telah di-refactor dari monolitik (`app.py` satu file) menjadi arsitektur
 
 | Komponen | File | Deskripsi |
 |----------|------|-----------|
-| App Factory | `app.py` | Pattern factory dengan `create_app()` untuk testability |
+| App Factory | `app.py` | Pattern factory, JWT callback, rate limiter |
 | Konfigurasi | `config.py` | PostgreSQL URI, JWT config, CORS, multi-environment |
 | ORM Models | `models/*.py` | 4 tabel: `users`, `reviews`, `analysis_results`, `pipeline_logs` |
-| Auth + RBAC | `routes/auth.py` | JWT login/register/refresh, decorator `@role_required` |
+| Auth + RBAC | `routes/auth.py` | JWT login/register/refresh/logout, decorator `@role_required`, token blacklist |
 | Dashboard API | `routes/dashboard.py` | Serving data agregasi dari JSON files |
 | Reviews API | `routes/reviews.py` | Server-side pagination + SQL filtering |
 | Predict API | `routes/predict.py` | Real-time sentiment prediction (SVM/NB) |
-| Pipeline API | `routes/pipeline.py` | Background script execution + monitoring |
+| Pipeline API | `routes/pipeline.py` | Background execution, CSV export, role-permissions |
 | Admin API | `routes/admin.py` | User CRUD, CSV→DB migration, DB stats |
 
 ### Teknologi Stack Backend
@@ -473,10 +588,11 @@ Backend telah di-refactor dari monolitik (`app.py` satu file) menjadi arsitektur
 | Teknologi | Versi | Fungsi |
 |-----------|-------|--------|
 | Flask | ≥3.0 | Web framework |
-| Flask-JWT-Extended | ≥4.6 | Autentikasi token JWT |
+| Flask-JWT-Extended | ≥4.6 | Autentikasi token JWT + token blacklisting |
 | PostgreSQL | ≥14 | Database relasional + JSONB |
 | SQLAlchemy | ≥2.0 | ORM (Object-Relational Mapping) |
 | Flask-Migrate | ≥4.0 | Database migration (Alembic) |
+| Flask-Limiter | ≥3.5 | Rate limiting (200 req/jam default) |
 | bcrypt | ≥4.1 | Password hashing |
 | Sastrawi + NLTK | — | NLP preprocessing untuk prediksi |
 
@@ -495,25 +611,28 @@ Ini memberikan fleksibilitas skema tanpa mengorbankan kemampuan query relasional
 
 ### Prioritas Tinggi 🔴
 
-| No | Rekomendasi | Detail |
-|----|-------------|--------|
-| 1 | **Integrasi Frontend ↔ Backend JWT** | Modifikasi VueJS dashboard agar login dulu sebelum akses data. Simpan token di `localStorage`, kirim via header `Authorization: Bearer <token>` di setiap request Axios. |
-| 2 | **Migrasi Data Explorer ke Server-side** | Ganti mekanisme Data Explorer yang saat ini memuat JSON 20MB di browser, menjadi memanggil `GET /api/reviews?page=1&per_page=25&branch=...` dari backend PostgreSQL. |
-| 3 | **Koneksi Algorithm Lab ke `/api/predict`** | Halaman prediksi real-time di dashboard saat ini belum terhubung ke backend. Hubungkan input teks ke endpoint `POST /api/predict`. |
+| No | Rekomendasi | Status | Detail |
+|----|-------------|--------|--------|
+| 1 | **Integrasi Frontend ↔ Backend JWT** | ⏳ Belum | Modifikasi VueJS dashboard agar login dulu sebelum akses data. Simpan token di `localStorage`, kirim via header `Authorization: Bearer <token>` di setiap request Axios. |
+| 2 | **Migrasi Data Explorer ke Server-side** | ⏳ Belum | Ganti mekanisme Data Explorer yang saat ini memuat JSON 20MB di browser, menjadi memanggil `GET /api/reviews?page=1&per_page=25&branch=...` dari backend PostgreSQL. |
+| 3 | **Koneksi Algorithm Lab ke `/api/predict`** | ⏳ Belum | Halaman prediksi real-time di dashboard saat ini belum terhubung ke backend. Hubungkan input teks ke endpoint `POST /api/predict`. |
+
+> **Catatan**: Ketiga item prioritas tinggi di atas memerlukan perubahan di sisi **frontend VueJS** (bukan backend). Backend API untuk ketiga fitur ini sudah sepenuhnya tersedia dan siap digunakan.
 
 ### Prioritas Sedang 🟡
 
-| No | Rekomendasi | Detail |
-|----|-------------|--------|
-| 4 | **WebSocket / SSE untuk Sync Center** | Saat ini pipeline monitoring menggunakan polling `GET /api/pipeline/status/<id>`. Idealnya gunakan WebSocket atau SSE agar progress bar di UI update secara *push-based* real-time. |
-| 5 | **Implementasi Celery Task Queue** | Untuk pipeline yang berat (scraping, training), ganti `threading` dengan Celery + Redis agar lebih robust, mendukung retry, dan bisa di-scale horizontal. |
-| 6 | **Role-based UI Rendering** | Sesuaikan tampilan dashboard berdasarkan role: sembunyikan menu Admin/Retrain untuk `user`, sembunyikan User Management untuk `analyst`. |
+| No | Rekomendasi | Status | Detail |
+|----|-------------|--------|--------|
+| 4 | **WebSocket / SSE untuk Sync Center** | ⏳ Belum | Saat ini pipeline monitoring menggunakan polling `GET /api/pipeline/status/<id>`. Idealnya gunakan WebSocket atau SSE agar progress bar di UI update secara *push-based* real-time. |
+| 5 | **Implementasi Celery Task Queue** | ⏳ Belum | Untuk pipeline yang berat (scraping, training), ganti `threading` dengan Celery + Redis agar lebih robust, mendukung retry, dan bisa di-scale horizontal. |
+| 6 | **Role-based UI Rendering** | ✅ Backend Ready | API `GET /api/pipeline/role-permissions` sudah menyediakan permission map per role. Frontend tinggal memanggil endpoint ini saat login untuk menyembunyikan/menampilkan menu. |
 
 ### Prioritas Rendah 🟢
 
-| No | Rekomendasi | Detail |
-|----|-------------|--------|
-| 7 | **Token Blacklisting (Logout)** | Implementasi Redis-based token blacklist agar token yang di-revoke (logout) benar-benar tidak bisa dipakai lagi. |
-| 8 | **Rate Limiting** | Tambahkan `flask-limiter` untuk membatasi jumlah request per IP/user, mencegah abuse pada endpoint prediksi. |
-| 9 | **API Documentation (Swagger)** | Gunakan `flask-smorest` atau `flasgger` untuk auto-generate dokumentasi API interaktif. |
-| 10 | **Unit & Integration Testing** | Buat test suite menggunakan `pytest` + `pytest-flask` untuk semua endpoint, termasuk test RBAC. |
+| No | Rekomendasi | Status | Detail |
+|----|-------------|--------|--------|
+| 7 | **Token Blacklisting (Logout)** | ✅ Selesai | `POST /api/auth/logout` menambahkan JTI ke in-memory blacklist. Callback `token_in_blocklist_loader` di `app.py` memverifikasi setiap request. |
+| 8 | **Rate Limiting** | ✅ Selesai | `flask-limiter` aktif dengan default 200 request/jam per IP. Mencegah abuse pada endpoint prediksi dan API lainnya. |
+| 9 | **CSV Export** | ✅ Selesai | `GET /api/pipeline/export-csv` memungkinkan admin & analyst mendownload data ulasan dengan filter (cabang, sentimen, aspek) dalam format CSV. |
+| 10 | **API Documentation (Swagger)** | ⏳ Belum | Gunakan `flask-smorest` atau `flasgger` untuk auto-generate dokumentasi API interaktif. |
+| 11 | **Unit & Integration Testing** | ⏳ Belum | Buat test suite menggunakan `pytest` + `pytest-flask` untuk semua endpoint, termasuk test RBAC. |

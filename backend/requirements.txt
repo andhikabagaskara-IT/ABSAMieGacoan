@@ -35,3 +35,6 @@ marshmallow>=3.20.0
 
 # Production WSGI Server
 gunicorn>=21.2.0
+
+# Rate Limiting
+flask-limiter>=3.5.0
