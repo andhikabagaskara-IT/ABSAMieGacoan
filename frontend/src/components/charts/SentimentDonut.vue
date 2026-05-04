@@ -23,7 +23,7 @@ const props = defineProps({
 const chartData = computed(() => {
   const labels = ['Positif', 'Netral', 'Negatif']
   const data = [props.positif, props.netral, props.negatif]
-  const colors = ['#10B981', '#F59E0B', '#EF4444']
+  const colors = ['#03A9F4', '#9FA8DA', '#F48FB1'] // Biru muda, Biru keunguan muda, Merah muda
   
   // Filter out zero values to keep chart clean
   const filtered = labels.map((label, i) => ({ label, data: data[i], color: colors[i] }))
@@ -35,7 +35,7 @@ const chartData = computed(() => {
       {
         backgroundColor: filtered.map(i => i.color),
         borderWidth: 0,
-        hoverOffset: 4,
+        hoverOffset: 8,
         data: filtered.map(i => i.data)
       }
     ]
@@ -46,6 +46,12 @@ const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   cutout: '70%',
+  animation: {
+    duration: 2000,
+    easing: 'easeOutQuart',
+    animateScale: true,
+    animateRotate: true
+  },
   plugins: {
     legend: {
       position: 'bottom',

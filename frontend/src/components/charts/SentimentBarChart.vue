@@ -36,19 +36,19 @@ const chartData = computed(() => {
     datasets: [
       {
         label: 'Positif',
-        backgroundColor: '#10B981',
+        backgroundColor: '#03A9F4',
         data: positifData,
         borderRadius: 4
       },
       {
         label: 'Netral',
-        backgroundColor: '#F59E0B',
+        backgroundColor: '#9FA8DA',
         data: netralData,
         borderRadius: 4
       },
       {
         label: 'Negatif',
-        backgroundColor: '#EF4444',
+        backgroundColor: '#F48FB1',
         data: negatifData,
         borderRadius: 4
       }
@@ -60,6 +60,17 @@ const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   indexAxis: 'y', // Horizontal bar chart
+  animation: {
+    duration: 1500,
+    easing: 'easeOutQuart',
+    delay: (context) => {
+      let delay = 0;
+      if (context.type === 'data' && context.mode === 'default') {
+        delay = context.dataIndex * 100 + context.datasetIndex * 100;
+      }
+      return delay;
+    }
+  },
   scales: {
     x: {
       stacked: true,

@@ -51,6 +51,17 @@ const chartData = computed(() => {
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
+  animation: {
+    duration: 1500,
+    easing: 'easeOutBounce',
+    delay: (context) => {
+      let delay = 0;
+      if (context.type === 'data' && context.mode === 'default') {
+        delay = context.dataIndex * 50 + context.datasetIndex * 50;
+      }
+      return delay;
+    }
+  },
   scales: {
     x: {
       stacked: true,

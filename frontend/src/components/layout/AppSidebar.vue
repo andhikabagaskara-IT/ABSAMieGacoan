@@ -66,11 +66,14 @@
     <div class="sidebar-footer">
       <div class="stat-item">
         <TrendingUp class="icon-small" />
-        <span>57.560 Ulasan</span>
+        <span>{{ totalReviews ? totalReviews.toLocaleString('id-ID') : '0' }} Ulasan</span>
       </div>
       <div class="stat-item">
         <Clock class="icon-small" />
         <span>Last sync: Hari ini</span>
+      </div>
+      <div class="developer-tag">
+        © 2026 Developed by Dhika
       </div>
     </div>
   </aside>
@@ -91,6 +94,7 @@ import {
 
 import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '../../stores/auth'
+import { useDashboardData } from '../../composables/useDashboardData'
 
 const props = defineProps({
   isOpen: {
@@ -101,6 +105,8 @@ const props = defineProps({
 
 const authStore = useAuthStore()
 const role = computed(() => authStore.user?.role?.toLowerCase() || 'user')
+
+const { totalReviews } = useDashboardData()
 
 defineEmits(['close'])
 
@@ -256,6 +262,15 @@ onMounted(() => {
 .icon-small {
   width: 14px;
   height: 14px;
+}
+
+.developer-tag {
+  font-size: 0.7rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
 }
 
 /* Responsive */
