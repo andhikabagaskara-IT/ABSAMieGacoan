@@ -63,7 +63,7 @@ onMounted(() => {
           {{ state.error }}
         </div>
         <router-view v-else v-slot="{ Component }">
-          <transition name="fade" mode="out-in">
+          <transition name="page" mode="out-in">
             <component :is="Component" />
           </transition>
         </router-view>
@@ -179,14 +179,19 @@ onMounted(() => {
 }
 
 /* Page transition */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.fade-enter-from,
-.fade-leave-to {
+.page-enter-from {
   opacity: 0;
+  transform: translateY(15px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-15px);
 }
 
 /* Responsive */

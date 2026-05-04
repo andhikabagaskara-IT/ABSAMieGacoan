@@ -211,12 +211,13 @@ onMounted(() => {
   padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
   color: rgba(255, 255, 255, 0.7);
-  transition: all var(--transition-fast);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .nav-item:hover {
   background-color: rgba(255, 255, 255, 0.05);
   color: white;
+  transform: translateX(6px);
 }
 
 .nav-item.router-link-active {

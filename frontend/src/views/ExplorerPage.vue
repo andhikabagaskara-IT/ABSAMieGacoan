@@ -410,9 +410,15 @@ const exportCsv = async () => {
 .review-text.truncated { color: var(--text-secondary); }
 .review-text.full { color: var(--text-primary); font-weight: 400; }
 
-.data-row { cursor: pointer; transition: background 0.15s; }
-.data-row:hover { background: rgba(3, 169, 244, 0.03); }
-.data-row.expanded { background: rgba(3, 169, 244, 0.05); }
+.data-row { cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+.data-row:hover { 
+  background: rgba(3, 169, 244, 0.05); 
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 2;
+}
+.data-row.expanded { background: rgba(3, 169, 244, 0.05); z-index: 1; }
 
 .empty-state { text-align: center; padding: 3rem !important; color: var(--text-secondary); }
 .empty-icon { width: 32px; height: 32px; margin-bottom: 0.5rem; opacity: 0.4; }
