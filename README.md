@@ -67,36 +67,35 @@ python scripts/06_lda_aspect.py        # Ekstraksi Aspek LDA
 python scripts/07_export_dashboard.py  # Export JSON untuk dashboard
 ```
 
-### B. Backend Fullstack (Flask + PostgreSQL)
+### B. Menjalankan Aplikasi Web Fullstack (Backend + Frontend)
 
+Untuk menggunakan dashboard dan fitur API secara bersamaan, Anda perlu menjalankan kedua server (backend dan frontend) di terminal yang terpisah.
+
+**Terminal 1: Menjalankan Backend (Flask API)**
 ```bash
-# 1. Install & jalankan PostgreSQL, lalu buat database:
-#    psql -U postgres
-#    CREATE DATABASE miegacoan_absa;
-
-# 2. Konfigurasi environment
+# 1. Masuk ke folder backend & aktifkan virtual environment (jika ada)
 cd backend
-copy .env.example .env
-# Edit .env: sesuaikan DATABASE_URL dengan password PostgreSQL Anda
+venv\Scripts\activate  # Windows
 
-# 3. Install dependencies & jalankan
-pip install -r requirements.txt
+# 2. Pastikan PostgreSQL berjalan dan database sudah terhubung di .env
+# 3. Jalankan server Flask
 python app.py
-# Server berjalan di http://localhost:5000
-
-# 4. (Pertama kali) Migrasi data CSV ke PostgreSQL
-# Login dulu via POST /api/auth/login, lalu:
-# POST /api/admin/migrate-csv dengan header Authorization: Bearer <token>
+# Backend akan berjalan di: http://localhost:5000
 ```
 
-### C. Dashboard VueJS
-
+**Terminal 2: Menjalankan Frontend (VueJS Dashboard)**
 ```bash
+# 1. Buka terminal baru, masuk ke folder dashboard
 cd dashboard
+
+# 2. Install package (hanya pertama kali)
 npm install
+
+# 3. Jalankan development server
 npm run dev
-# Dashboard berjalan di http://localhost:5173
+# Frontend akan berjalan di: http://localhost:5173
 ```
+> Buka browser dan akses **`http://localhost:5173`** untuk menggunakan aplikasi. Anda bisa login menggunakan akun default admin: `admin@miegacoan.com` (pass: `admin123`).
 
 ## 📡 API Endpoints Utama
 

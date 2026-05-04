@@ -7,7 +7,7 @@ Akses: admin & analyst
 import os
 import re
 import logging
-import pickle
+import joblib
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
@@ -19,6 +19,7 @@ log = logging.getLogger(__name__)
 predict_bp = Blueprint('predict', __name__, url_prefix='/api')
 
 _model_cache = {}
+_model_load_errors = {}   # Simpan pesan error loading per model
 _slang_dict = {
     "yg": "yang", "gak": "tidak", "ga": "tidak", "nggak": "tidak",
     "gk": "tidak", "bgt": "banget", "udh": "sudah", "udah": "sudah",
@@ -35,14 +36,19 @@ def _load_model(filename, cache_key):
         return _model_cache[cache_key]
     filepath = os.path.join(MODELS_DIR, filename)
     if not os.path.exists(filepath):
+        _model_load_errors[cache_key] = "File tidak ditemukan"
         return None
     try:
-        with open(filepath, 'rb') as f:
-            model = pickle.load(f)
+        # Gunakan joblib karena model digenerate oleh script pipeline dengan joblib
+        model = joblib.load(filepath)
         _model_cache[cache_key] = model
+        if cache_key in _model_load_errors:
+            del _model_load_errors[cache_key]
         return model
     except Exception as e:
-        log.error(f"Gagal memuat model {filepath}: {e}")
+        error_msg = f"Gagal memuat model {filepath}: {e}"
+        log.error(error_msg)
+        _model_load_errors[cache_key] = str(e)
         return None
 
 
@@ -105,7 +111,11 @@ def predict_sentiment():
     tfidf = _load_model('tfidf_vectorizer.pkl', 'tfidf')
 
     if not tfidf:
-        return jsonify({'error': 'Model belum tersedia'}), 503
+        errors = {k: v for k, v in _model_load_errors.items()}
+        return jsonify({
+            'error': 'Model belum tersedia atau gagal dimuat',
+            'details': errors
+        }), 503
 
     preprocessed = preprocess_text(raw_text)
     if not preprocessed:
@@ -117,12 +127,13 @@ def predict_sentiment():
     if svm:
         try:
             pred = svm.predict(vec)[0]
+            if hasattr(pred, 'item'): pred = pred.item()
             conf = {}
             if hasattr(svm, 'decision_function'):
                 scores = svm.decision_function(vec)[0]
                 if hasattr(scores, '__len__'):
                     for i, lbl in enumerate(svm.classes_):
-                        conf[lbl] = round(float(scores[i]), 4)
+                        conf[str(lbl)] = round(float(scores[i]), 4)
             result['predictions']['svm'] = {'label': pred, 'confidence': conf}
         except Exception as e:
             result['predictions']['svm'] = {'error': str(e)}
@@ -130,8 +141,9 @@ def predict_sentiment():
     if nb:
         try:
             pred = nb.predict(vec)[0]
+            if hasattr(pred, 'item'): pred = pred.item()
             proba = nb.predict_proba(vec)[0]
-            conf = {lbl: round(float(proba[i]), 4) for i, lbl in enumerate(nb.classes_)}
+            conf = {str(lbl): round(float(proba[i]), 4) for i, lbl in enumerate(nb.classes_)}
             result['predictions']['nb'] = {'label': pred, 'confidence': conf}
         except Exception as e:
             result['predictions']['nb'] = {'error': str(e)}
@@ -143,10 +155,16 @@ def predict_sentiment():
 @jwt_required()
 def predict_status():
     """Cek ketersediaan model prediksi."""
+    # Force load untuk mengecek status (bisa jadi file ada tapi corrupt/beda versi sklearn)
+    _load_model('svm_model.pkl', 'svm')
+    _load_model('nb_model.pkl', 'nb')
+    _load_model('tfidf_vectorizer.pkl', 'tfidf')
+    
     checks = {
-        'svm_model': os.path.exists(os.path.join(MODELS_DIR, 'svm_model.pkl')),
-        'nb_model': os.path.exists(os.path.join(MODELS_DIR, 'nb_model.pkl')),
-        'tfidf_vectorizer': os.path.exists(os.path.join(MODELS_DIR, 'tfidf_vectorizer.pkl')),
+        'svm_model': os.path.exists(os.path.join(MODELS_DIR, 'svm_model.pkl')) and 'svm' not in _model_load_errors,
+        'nb_model': os.path.exists(os.path.join(MODELS_DIR, 'nb_model.pkl')) and 'nb' not in _model_load_errors,
+        'tfidf_vectorizer': os.path.exists(os.path.join(MODELS_DIR, 'tfidf_vectorizer.pkl')) and 'tfidf' not in _model_load_errors,
     }
     checks['models_ready'] = all(checks.values())
+    checks['errors'] = _model_load_errors
     return jsonify(checks)
