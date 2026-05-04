@@ -31,8 +31,7 @@
       </div>
     </div>
 
-    <!-- Row 2: Live Predictor -->
-    <LivePredictor />
+    <!-- Row 2: Live Predictor (Removed based on user request) -->
 
     <!-- Row 3: SMOTE Summary -->
     <SmoteSummary />
@@ -41,7 +40,6 @@
 
 <script setup>
 import ModelCard from '../components/lab/ModelCard.vue'
-import LivePredictor from '../components/lab/LivePredictor.vue'
 import SmoteSummary from '../components/lab/SmoteSummary.vue'
 </script>
 
