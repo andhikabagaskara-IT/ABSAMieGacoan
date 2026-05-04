@@ -1,63 +1,70 @@
 <template>
   <div class="overview-page">
-    <!-- Row 1: KPI Cards -->
-    <div class="kpi-grid">
-      <StatCard 
-        label="Total Review" 
-        :value="totalReviews" 
-        :icon="MessageSquare" 
-      />
-      <StatCard 
-        label="Sentimen Positif" 
-        :value="`${sentimentPercentage.positif}%`" 
-        :subtitle="`${formatNumber(sentimentDistribution.positif || 0)} ulasan`"
-        type="positive"
-        :icon="Smile" 
-      />
-      <StatCard 
-        label="Sentimen Netral" 
-        :value="`${sentimentPercentage.netral}%`" 
-        :subtitle="`${formatNumber(sentimentDistribution.netral || 0)} ulasan`"
-        type="warning"
-        :icon="Meh" 
-      />
-      <StatCard 
-        label="Sentimen Negatif" 
-        :value="`${sentimentPercentage.negatif}%`" 
-        :subtitle="`${formatNumber(sentimentDistribution.negatif || 0)} ulasan`"
-        type="negative"
-        :icon="Frown" 
-      />
-      <StatCard 
-        label="Total Cabang" 
-        :value="branchList.length" 
-        :icon="Store" 
-      />
+    <div v-if="state.loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Mengambil Data Dashboard...</p>
     </div>
-
-    <!-- Row 2: Charts -->
-    <div class="charts-grid">
-      <div class="bar-chart-wrapper">
-        <SentimentBarChart :branchData="branchSentiment" />
-      </div>
-      <div class="donut-chart-wrapper">
-        <SentimentDonut 
-          :positif="sentimentDistribution.positif || 0" 
-          :negatif="sentimentDistribution.negatif || 0" 
-          :netral="sentimentDistribution.netral || 0"
+    
+    <template v-else>
+      <!-- Row 1: KPI Cards -->
+      <div class="kpi-grid">
+        <StatCard 
+          label="Total Review" 
+          :value="totalReviews" 
+          :icon="MessageSquare" 
+        />
+        <StatCard 
+          label="Sentimen Positif" 
+          :value="`${sentimentPercentage.positif}%`" 
+          :subtitle="`${formatNumber(sentimentDistribution.positif || 0)} ulasan`"
+          type="positive"
+          :icon="Smile" 
+        />
+        <StatCard 
+          label="Sentimen Netral" 
+          :value="`${sentimentPercentage.netral}%`" 
+          :subtitle="`${formatNumber(sentimentDistribution.netral || 0)} ulasan`"
+          type="warning"
+          :icon="Meh" 
+        />
+        <StatCard 
+          label="Sentimen Negatif" 
+          :value="`${sentimentPercentage.negatif}%`" 
+          :subtitle="`${formatNumber(sentimentDistribution.negatif || 0)} ulasan`"
+          type="negative"
+          :icon="Frown" 
+        />
+        <StatCard 
+          label="Total Cabang" 
+          :value="branchList.length" 
+          :icon="Store" 
         />
       </div>
-    </div>
 
-    <!-- Row 3: Leaderboard -->
-    <div class="leaderboard-wrapper">
-      <BranchLeaderboard :branchData="branchSentiment" />
-    </div>
+      <!-- Row 2: Charts -->
+      <div class="charts-grid">
+        <div class="bar-chart-wrapper">
+          <SentimentBarChart :branchData="branchSentiment" />
+        </div>
+        <div class="donut-chart-wrapper">
+          <SentimentDonut 
+            :positif="sentimentDistribution.positif || 0" 
+            :negatif="sentimentDistribution.negatif || 0" 
+            :netral="sentimentDistribution.netral || 0"
+          />
+        </div>
+      </div>
 
-    <!-- Row 4: Branch Gallery -->
-    <div class="gallery-wrapper">
-      <BranchGallery />
-    </div>
+      <!-- Row 3: Leaderboard -->
+      <div class="leaderboard-wrapper">
+        <BranchLeaderboard :branchData="branchSentiment" />
+      </div>
+
+      <!-- Row 4: Branch Gallery -->
+      <div class="gallery-wrapper">
+        <BranchGallery />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -71,6 +78,7 @@ import BranchLeaderboard from '../components/cards/BranchLeaderboard.vue'
 import BranchGallery from '../components/cards/BranchGallery.vue'
 
 const { 
+  state,
   totalReviews, 
   sentimentDistribution, 
   sentimentPercentage,
@@ -134,6 +142,29 @@ const formatNumber = (num) => {
   .kpi-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(3, 169, 244, 0.1);
+  border-left-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 @media (max-width: 576px) {

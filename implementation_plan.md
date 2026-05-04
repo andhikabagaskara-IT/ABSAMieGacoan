@@ -361,11 +361,34 @@ Backend Flask telah dikembangkan menjadi arsitektur **fullstack modular** dengan
 - **Library**: Flask-JWT-Extended (access token + refresh token + token blacklisting).
 - **3 Role Pengguna** (model `User` di `models/user.py`):
 
-| Role | Nama | Deskripsi | Hak Akses |
-|------|------|-----------|------------|
-| `admin` | Manajemen | Full access | CRUD user, scraping, retrain, hapus data, migrasi DB, export |
-| `analyst` | Marketing / Data Scientist | Analisis, prediksi, & scraping | Dashboard, prediksi sentimen, scraping, retrain, export, riwayat pipeline |
-| `user` | Pegawai / Staf Biasa | Read-only | Lihat dashboard, data explorer, profil sendiri |
+### 🛡️ Detail Fitur Berdasarkan Role (Hak Akses)
+
+Untuk mengamankan sistem dan menjaga integritas data, aplikasi ini membagi *user* ke dalam 3 level hak akses (Role-Based Access Control):
+
+#### 1. 👑 Role: Admin (Level Tertinggi)
+*Akun Default: `admin@miegacoan.com` | Password: `admin123`*
+Berfungsi sebagai administrator sistem dan manajemen data.
+*   **Akses ke Semua Menu Dashboard**: Bisa melihat Dashboard Overview, Analisis Cabang, Aspek Deep Dive, Algorithm Lab, Data Explorer, dan Sync Center.
+*   **Akses Penuh Sync Center**: Bisa mengontrol *web scraper* (Selenium) untuk mengambil data ulasan baru dari Google Maps, dan melihat log proses scraping secara *real-time*.
+*   **Retrain Machine Learning**: Berhak menjalankan proses pelatihan ulang model (*retrain*) SVM, Naive Bayes, dan LDA apabila ada data ulasan baru.
+*   **Export CSV**: Memiliki fitur eksklusif untuk mengekspor (download) ribuan baris data ulasan ke dalam file `.csv` langsung dari Data Explorer.
+*   **Akses Prediksi**: Bisa mencoba fitur "Live Predictor" di Algorithm Lab.
+*   **Manajemen User**: (Via API backend) Punya akses ke rute administrator untuk migrasi database, tambah user baru, atau hapus data ulasan.
+
+#### 2. 🕵️ Role: Analyst (Level Menengah)
+*Akun Default: `analyst@miegacoan.com` | Password: `analyst123`*
+Ditujukan untuk tim Data Scientist atau divisi Marketing yang fokus pada analisa hasil.
+*   **Akses Visualisasi Data**: Bisa melihat secara penuh Dashboard Overview, Analisis Cabang, dan Aspek Deep Dive.
+*   **Akses Algorithm Lab**: Diizinkan mengakses halaman ini untuk menguji performa prediksi kalimat ulasan baru (Live Predictor).
+*   **Akses Data Explorer & Export CSV**: Bisa menelusuri data dan mengekspor ulasan Gacoan ke format `.csv` untuk bahan analisa *offline*.
+*   **Terbatas dari Sync Center**: *Analyst* **tidak diizinkan** masuk ke menu Sync Center. Hal ini untuk mencegah *analyst* salah/tidak sengaja memulai ulang proses scraping yang membebani server dan database.
+
+#### 3. 👤 Role: User / Staff (Level Dasar)
+*Akun Default: `staff@miegacoan.com` | Password: `staff123`*
+Ditujukan untuk pegawai cabang biasa, staf lapangan, atau pihak manajemen level cabang yang cuma perlu "baca laporan".
+*   **Read-Only (Hanya Membaca)**: Hanya punya akses ke Dashboard Overview, Analisis Cabang, Aspek Deep Dive, dan menelusuri Data Explorer.
+*   **Sidebar Terbatas**: Menu *Sync Center* dan *Algorithm Lab* sama sekali tidak muncul di navigasi kiri (Sidebar).
+*   **Tanpa Fitur Export**: Di halaman Data Explorer, *User* tidak akan menemukan tombol "Export CSV", sehingga mencegah staf biasa mengunduh atau mencuri keseluruhan *database* ulasan perusahaan.
 
 - **RBAC Decorator**: `@role_required(UserRole.ADMIN, UserRole.ANALYST)` di `routes/auth.py` — memastikan hanya role yang diizinkan yang bisa mengakses endpoint tertentu.
 - **Password Hashing**: bcrypt (salt-based).
@@ -585,23 +608,23 @@ Karena fondasi backend (API) sudah berdiri kokoh, langkah selanjutnya adalah **m
 
 Berikut adalah **Rencana Pengerjaan (Next Steps)** yang direkomendasikan:
 
-### Tahap 1: Integrasi Autentikasi di Frontend (Prioritas Tinggi) 🔴
+### Tahap 1: Integrasi Autentikasi di Frontend (Prioritas Tinggi) ✅ Selesai
 *   **Routing Guard**: Membuat logika pelindung halaman di Vue Router (`vue-router`) agar halaman Dashboard, Data Explorer, dan Algorithm Lab tidak bisa diakses tanpa login.
 *   **Login Page Connection**: Menghubungkan form login di frontend VueJS dengan endpoint `POST http://localhost:5000/api/auth/login`.
 *   **State Management**: Menyimpan Token JWT yang didapat dari backend ke dalam `localStorage` atau `Pinia/Vuex state`.
 *   **Axios Interceptor**: Mengatur Axios agar otomatis melampirkan *header* `Authorization: Bearer <token>` di setiap request HTTP yang keluar dari VueJS ke Backend.
 
-### Tahap 2: Menghubungkan Komponen UI dengan Backend (Prioritas Tinggi) 🔴
+### Tahap 2: Menghubungkan Komponen UI dengan Backend (Prioritas Tinggi) ✅ Selesai
 *   **Dashboard Widget**: Mengganti pemanggilan data statis JSON di Dashboard Vue dengan *fetching* data langsung dari endpoint `GET /api/dashboard`.
 *   **Data Explorer Berbasis Server**: Memodifikasi halaman Data Explorer agar tidak lagi memuat *file* 20MB secara statis, melainkan memanggil `GET /api/reviews?page=1&per_page=20` (implementasi *Server-Side Pagination* di frontend).
 *   **Live Prediction (Algorithm Lab)**: Menyambungkan form input teks di halaman *Algorithm Lab* dengan endpoint `POST /api/predict` agar user bisa mengetes sentimen kalimat secara *real-time* di antarmuka web.
 
-### Tahap 3: Implementasi Fitur Berbasis Role (RBAC UI) 🟡
+### Tahap 3: Implementasi Fitur Berbasis Role (RBAC UI) ✅ Selesai
 *   **Dynamic Sidebar**: Menyembunyikan menu tertentu berdasarkan level Role user (contoh: *User* biasa tidak melihat menu *Sync Center* atau *Admin Panel*).
 *   **Tombol Fungsionalitas Ekstra**: Mengaktifkan tombol "Export CSV" di Data Explorer untuk menembak endpoint `/api/pipeline/export-csv`.
 
-### Tahap 4: Finalisasi UI/UX & Deployment (Prioritas Menengah) 🟢
-*   Merapikan *error handling* di UI (misal menampilkan toast/notifikasi berwarna merah jika token expired atau login gagal).
+### Tahap 4: Finalisasi UI/UX & Deployment (Prioritas Menengah) ✅ Selesai
+*   Merapikan *error handling* di UI (termasuk *interceptor* untuk token kadaluwarsa/401 Unauthorized yang akan me-lempar user ke halaman Login secara otomatis).
 *   Membuat indikator loading yang mulus (*skeleton loader* atau *spinner*) saat VueJS sedang mengambil data dari Flask backend.
 
 > **Cara Memulai Pengerjaan Selanjutnya:**

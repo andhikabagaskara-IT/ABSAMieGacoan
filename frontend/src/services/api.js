@@ -21,4 +21,18 @@ api.interceptors.request.use(
   }
 )
 
+// Response interceptor to handle token expiration (401)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      console.warn('Token expired or invalid. Redirecting to login...')
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('gacoan_user')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
 export default api
