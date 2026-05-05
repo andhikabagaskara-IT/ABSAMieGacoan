@@ -16,7 +16,7 @@ imbalanced-learn>=0.12.0
 
 # Topic Modeling (LDA)
 gensim==4.3.3
-scipy==1.11.4
+scipy==1.13.1
 
 # Visualization
 matplotlib>=3.8.0
