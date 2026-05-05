@@ -14,9 +14,9 @@ Sastrawi>=1.0.1
 scikit-learn>=1.4.0
 imbalanced-learn>=0.12.0
 
-# Topic Modeling (LDA)
+# Topic Modeling
 gensim==4.3.3
-scipy==1.13.1
+scipy==1.11.4
 
 # Visualization
 matplotlib>=3.8.0
@@ -27,7 +27,7 @@ wordcloud>=1.9.0
 openpyxl>=3.1.0
 joblib>=1.3.0
 
-# Backend (Flask)
+# Backend
 flask>=3.0.0
 flask-cors>=4.0.0
 flask-restful>=0.3.10

@@ -92,7 +92,7 @@ const displayValue = computed(() => {
 }
 
 .icon-positive {
-  background-color: rgba(16, 185, 129, 0.1);
+  background-color: #10b9811a;
   color: var(--positive);
 }
 
